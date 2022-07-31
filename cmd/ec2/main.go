@@ -1,8 +1,14 @@
+// EC2 game
+
 package main
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"os"
+
+	"github.com/greenm01/ec2/internal/ships"
 )
 
 const (
@@ -23,8 +29,13 @@ func run(args []string, stdout io.Writer) error {
 		return errors.New("no names")
 	}
 	for _, name := range args[1:] {
-		fmt.Fprintf(stdout, "Hi %s", name)
+		fmt.Println("Hi",name)
 	}
+
 	// do something
+	myShip := ships.Destroyer{}
+	myShip.Type = 5
+
 	return nil
+
 }
