@@ -21,7 +21,7 @@ func Build() error {
 
 // Remove the temporarily generated files from Release.
 func Clean() error {
-	return sh.Rm("ec2game")
+	return sh.Run("go","clean")
 }
 
 
