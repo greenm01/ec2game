@@ -1,4 +1,4 @@
-module github.com/greenm01/ec2
+module github.com/greenm01/ec2game
 
 go 1.18
 

@@ -1,8 +1,4 @@
-package planet
-
-include (
-	"github.com/greenm01/ec2/internal/fleet"
-)
+package ga
 
 type Army struct {
 	Attack int
@@ -17,19 +13,19 @@ type groundBattery struct {
 }
 
 type starDock struct {
-	Ships []fleet.Ship
+	Ships []Ship
 	Armies []Army
 	
 }
 
 type Planet struct {
-	Location [2]int
+	Pos pos
 	Name string
 	Owner string
 	MaxProduction int
 	CurProduction int
 	storedPoints int
-	AR []army
+	AR []Army
 	GB []groundBattery
 	Dock starDock
 }

@@ -1,8 +1,4 @@
-package fleet
-
-include (
-	"github.com/grenem01/ec2/internal/planet"
-)
+package ga
 
 type Ship struct {
 	Name string
@@ -36,18 +32,13 @@ type ETAC struct {
 
 type TroopTransport struct {
 	Ship
-	Armies []planet.Army
-}
-
-type Mission struct {
-	ID int
-	Destination [2]int
+	Armies []Army
 }
 
 type Fleet struct {
 	ID int
 	Ships []Ship
-	Location [2]int
+	Pos pos
 	Speed int
 	MaxSpeed int
 	ROE int

@@ -9,12 +9,6 @@ import (
 	"github.com/magefile/mage/mg"	
 )
 
-const (
-	ec2loc = "./cmd/ec2/"
-	loc2 = "./..."
-)
-
-
 func Build() error {
 	fmt.Println("Build running")
 	mg.Deps(Clean)
@@ -22,12 +16,12 @@ func Build() error {
 	if err := sh.Run("go", "mod", "download"); err != nil {
 		return err
 	}
-	return sh.Run("go", "build", ec2loc)
+	return sh.Run("go", "build")
 }
 
 // Remove the temporarily generated files from Release.
 func Clean() error {
-	return sh.Rm("ec2")
+	return sh.Rm("ec2game")
 }
 
 
