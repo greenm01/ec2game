@@ -1,10 +1,10 @@
 package planet
 
 include (
-	"github.com/greenm01/ec2/internal/ship"
+	"github.com/greenm01/ec2/internal/fleet"
 )
 
-type army struct {
+type Army struct {
 	Attack int
 	Defense int
 	Health int
@@ -17,7 +17,7 @@ type groundBattery struct {
 }
 
 type starDock struct {
-	Ships []ship.Ship
+	Ships []fleet.Ship
 	Armies []Army
 	
 }
@@ -31,5 +31,5 @@ type Planet struct {
 	storedPoints int
 	AR []army
 	GB []groundBattery
-	Dock StarDock
+	Dock starDock
 }

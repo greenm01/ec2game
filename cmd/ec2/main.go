@@ -8,7 +8,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/greenm01/ec2/internal/ships"
+	"github.com/greenm01/ec2/internal/ship"
 )
 
 const (
@@ -33,7 +33,7 @@ func run(args []string, stdout io.Writer) error {
 	}
 
 	// do something
-	myShip := ships.Destroyer{}
+	myShip := ship.Destroyer{}
 	myShip.Type = 5
 
 	return nil
