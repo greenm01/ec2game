@@ -39,7 +39,7 @@ type TroopTransport struct {
 	Armies []planet.Army
 }
 
-typw Mission struct {
+type Mission struct {
 	ID int
 	Destination [2]int
 }
