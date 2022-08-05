@@ -10,6 +10,14 @@ import (
 	"github.com/magefile/mage/mg"	
 )
 
+func checkOS () string {
+	if runtime.GOOS == "windows" {
+		return "ec2game.exe"
+	} else {
+		return "ec2game"
+	}	
+}
+
 func Build() error {
 	fmt.Println("Build running")
 	mg.Deps(Clean)
@@ -17,18 +25,18 @@ func Build() error {
 	if err := sh.Run("go", "mod", "download"); err != nil {
 		return err
 	}
-	return sh.Run("go", "build","./cmd/ec2game")
+	
+	if err := sh.Run("go", "build","-ldflags", "-s -w", "./cmd/ec2game"); err != nil {
+		return err
+	}
+
+	fmt.Println("compressing executible with upx")	
+	return sh.Run("upx","-9",checkOS())
 }
 
 // Remove the temporarily generated files from Release.
 func Clean() error {
-	if runtime.GOOS == "windows" {
-		fmt.Println("Detected Windows OS")
-		return sh.Rm("ec2game.exe")
-	} else {
-		fmt.Println("Detected POSIX")
-		return sh.Rm("ec2game")
-	}
+	return sh.Rm(checkOS())
 }
 
 

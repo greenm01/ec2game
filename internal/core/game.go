@@ -8,13 +8,8 @@ import (
 	"github.com/rivo/tview"
 )
 
-/*
-// App : Global App variable.
-var (
-	App *EC2
-	AppVersion = "EC2 v0.1"
-)
-*/
+// AppVersion : Global App Version
+const AppVersion = "EC2 v0.1"
 
 // EC2 : The client game for this application.
 type EC2 struct {
@@ -57,14 +52,13 @@ func (m *EC2) Shutdown() {
 	// Stop all necessary services, such as logging.
 
 	// Sync the screen to make sure that the terminal screen is not corrupted.
-	//App.TView.Sync()
-	//App.TView.Stop()
+	m.TView.Sync()
+	m.TView.Stop()
 
 	// Stop the logging
-	/*
-	if err := m.stopLogging(); err != nil {
-		fmt.Println("Error while closing log file!")
-	}
-	*/
-	fmt.Println("Application shutdown.")
+	//if err := m.stopLogging(); err != nil {
+	//	fmt.Println("Error while closing log file!")
+	//}
+	fmt.Println("Game shutdown.")
+	
 }
