@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"github.com/greenm01/ec2game/app/core"
+	//"github.com/greenm01/ec2game/internal/core"
 	//"github.com/greenm01/ec2game/app/ui/utils"
 	"github.com/rivo/tview"
 	//"log"
@@ -16,9 +16,9 @@ type LoginPage struct {
 // ShowLoginPage : Make the app show the login page.
 func ShowLoginPage() {
 	// Create the new login page
-	loginPage := newLoginPage()
+	//loginPage := newLoginPage()
 
-	core.App.TView.SetFocus(loginPage.Grid)
+	//core.App.TView.SetFocus(loginPage.Grid)
 	//core.App.PageHolder.AddAndSwitchToPage(utils.LoginPageID, loginPage.Grid, true)
 }
 
