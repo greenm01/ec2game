@@ -19,19 +19,14 @@ func checkOS () string {
 }
 
 func Build() error {
-	fmt.Println("Build running")
+	fmt.Println("Building executible...")
 	mg.Deps(Clean)
 	
 	if err := sh.Run("go", "mod", "download"); err != nil {
 		return err
 	}
 	
-	if err := sh.Run("go", "build","-ldflags", "-s -w", "./cmd/ec2game"); err != nil {
-		return err
-	}
-
-	fmt.Println("compressing executible with upx")	
-	return sh.Run("upx","-9",checkOS())
+	return sh.Run("go", "build","-ldflags", "-s -w", "./cmd/ec2game");  
 }
 
 // Remove the temporarily generated files from Release.
