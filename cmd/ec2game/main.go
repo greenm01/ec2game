@@ -3,16 +3,14 @@
 package main
 
 import (
-	"errors"
-	"fmt"
+	//"errors"
+    "fmt"
+    "os"
 	"io"
-	"os"
-	"log"
-
-	"github.com/rivo/tview"
-
+	
 	"github.com/greenm01/ec2game/internal/core"
-	"github.com/greenm01/ec2game/internal/ui"
+	
+    tea "github.com/charmbracelet/bubbletea"
 )
 
 const (
@@ -29,31 +27,19 @@ func main() {
 }
 
 func run(args []string, stdout io.Writer) error {
+	/*
 	if len(args) < 2 {
 		return errors.New("no names")
 	}
 	for _, name := range args[1:] {
-		fmt.Fprintf(stdout, "Hi %s", name)
-	}
+		fmt.Fprintf(stdout, "Hi %s\n", name)
+	}*/
 
-	// Create and initialize the game
-	game := &core.EC2{
-		TView:      tview.NewApplication(),
-		PageHolder: tview.NewPages(),
-	}
-
-	game.Initialise()
-	
-	ui.SetUniversalHandlers(game)
-	
-	// Run the app.
-	log.Println("Running app...")
-	if err := game.TView.Run(); err != nil {
-		log.Println(err)
-	}	
-
-	// Shut it all down
-	game.Shutdown()
+	p := tea.NewProgram(core.InitGame())
+    	if err := p.Start(); err != nil {
+        	fmt.Printf("Alas, there's been an error: %v", err)
+        	os.Exit(1)
+    	}	
 
 	return nil
 }

@@ -2,63 +2,106 @@ package core
 
 import (
 	"fmt"
-	//"log"
-	"os"
 
-	"github.com/rivo/tview"
+    tea "github.com/charmbracelet/bubbletea"
 )
 
 // AppVersion : Global App Version
 const AppVersion = "EC2 v0.1"
 
-// EC2 : The client game for this application.
 type EC2 struct {
-	//Client *mangodex.DexClient
-
-	TView      *tview.Application
-	PageHolder *tview.Pages
-
-	Config  *UserConfig
-	LogFile *os.File
+	choices []string
+	cursor int
+	selected map[int]struct{}
 }
 
-// Initialise : Initialise the app. Return error if unable to restore previous session.
-func (m *EC2) Initialise() error {
-	// Set up logging.
-	/*
-    if err := m.setUpLogging(); err != nil {
-		fmt.Println("Unable to set up logging...")
-		fmt.Println("Application will not continue.")
-		os.Exit(1)
-	}*/
 
-	// Load user configuration.
-    /*
-	if err := m.loadConfiguration(); err != nil {
-		log.Println("Unable to read configuration file. Is it formatted correctly?")
-		log.Println("If in doubt, delete the configuration file to start over!\n\nDetails:")
-		log.Println(err.Error())
-		os.Exit(1)
-	}*/
+func InitGame() EC2 {
+	return EC2 {
+		// Command menu options
+		choices:  []string{"General", "Planets", "Fleets"},
 
-	// Set the page holder as the application root and focus on it.
-	m.TView.SetRoot(m.PageHolder, true).SetFocus(m.PageHolder)
-	return nil
-
+		// A map which indicates which choices are selected. We're using
+		// the  map like a mathematical set. The keys refer to the indexes
+		// of the `choices` slice, above.
+		selected: make(map[int]struct{}),
+	}
 }
 
-// Shutdown : Stop all services such as logging and let the application shut down gracefully.
-func (m *EC2) Shutdown() {
-	// Stop all necessary services, such as logging.
+func (m EC2) Init() tea.Cmd {
+    // Just return `nil`, which means "no I/O right now, please."
+    return nil
+}
 
-	// Sync the screen to make sure that the terminal screen is not corrupted.
-	m.TView.Sync()
-	m.TView.Stop()
 
-	// Stop the logging
-	//if err := m.stopLogging(); err != nil {
-	//	fmt.Println("Error while closing log file!")
-	//}
-	fmt.Println("Game shutdown.")
-	
+func (m EC2) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+    switch msg := msg.(type) {
+
+    // Is it a key press?
+    case tea.KeyMsg:
+
+        // Cool, what was the actual key pressed?
+        switch msg.String() {
+
+        // These keys should exit the program.
+        case "ctrl+c", "q":
+            return m, tea.Quit
+
+        // The "up" and "k" keys move the cursor up
+        case "up", "k":
+            if m.cursor > 0 {
+                m.cursor--
+            }
+
+        // The "down" and "j" keys move the cursor down
+        case "down", "j":
+            if m.cursor < len(m.choices)-1 {
+                m.cursor++
+            }
+
+        // The "enter" key and the spacebar (a literal space) toggle
+        // the selected state for the item that the cursor is pointing at.
+        case "enter", " ":
+            _, ok := m.selected[m.cursor]
+            if ok {
+                delete(m.selected, m.cursor)
+            } else {
+                m.selected[m.cursor] = struct{}{}
+            }
+        }
+    }
+
+    // Return the updated model to the Bubble Tea runtime for processing.
+    // Note that we're not returning a command.
+    return m, nil
+}
+
+func (m EC2) View() string {
+    // The header
+    s := "Ready for your command:\n\n"
+
+    // Iterate over our choices
+    for i, choice := range m.choices {
+
+        // Is the cursor pointing at this choice?
+        cursor := " " // no cursor
+        if m.cursor == i {
+            cursor = ">" // cursor!
+        }
+
+        // Is this choice selected?
+        checked := " " // not selected
+        if _, ok := m.selected[i]; ok {
+            checked = "x" // selected!
+        }
+
+        // Render the row
+        s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+    }
+
+    // The footer
+    s += "\nPress q to quit.\n"
+
+    // Send the UI for rendering
+    return s
 }
