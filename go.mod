@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/charmbracelet/bubbletea v0.22.0
+	github.com/charmbracelet/lipgloss v0.5.0
 	github.com/magefile/mage v1.13.0
 	github.com/treilik/bubbleboxer v0.1.0
 )

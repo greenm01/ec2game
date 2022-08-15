@@ -3,13 +3,13 @@
 // This program generates a property file in Go file from Unicode Character
 // Database auxiliary data files. The command line arguments are as follows:
 //
-//  1. The name of the Unicode data file (just the filename, without extension).
-//  2. The name of the locally generated Go file.
-//  3. The name of the slice mapping code points to properties.
-//  4. The name of the generator, for logging purposes.
-//  5. (Optional) Flags, comma-separated. The following flags are available:
-//     - "emojis": include emoji properties (Extended Pictographic only).
-//     - "gencat": include general category properties.
+//   1. The name of the Unicode data file (just the filename, without extension).
+//   2. The name of the locally generated Go file.
+//   3. The name of the slice mapping code points to properties.
+//   4. The name of the generator, for logging purposes.
+//   5. (Optional) Flags, comma-separated. The following flags are available:
+//        - "emojis": include emoji properties (Extended Pictographic only).
+//        - "gencat": include general category properties.
 //
 //go:generate go run gen_properties.go auxiliary/GraphemeBreakProperty graphemeproperties.go graphemeCodePoints graphemes emojis
 //go:generate go run gen_properties.go auxiliary/WordBreakProperty wordproperties.go workBreakCodePoints words emojis

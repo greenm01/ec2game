@@ -1,6 +1,9 @@
 # github.com/charmbracelet/bubbletea v0.22.0
 ## explicit; go 1.13
 github.com/charmbracelet/bubbletea
+# github.com/charmbracelet/lipgloss v0.5.0
+## explicit; go 1.15
+github.com/charmbracelet/lipgloss
 # github.com/containerd/console v1.0.3
 ## explicit; go 1.13
 github.com/containerd/console
@@ -28,6 +31,8 @@ github.com/muesli/cancelreader
 ## explicit; go 1.13
 github.com/muesli/reflow/ansi
 github.com/muesli/reflow/truncate
+github.com/muesli/reflow/wordwrap
+github.com/muesli/reflow/wrap
 # github.com/muesli/termenv v0.11.1-0.20220212125758-44cd13922739
 ## explicit; go 1.13
 github.com/muesli/termenv

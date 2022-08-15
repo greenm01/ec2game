@@ -1,7 +1,9 @@
 package io
 
 import (
+	//"fmt"
 	tea "github.com/charmbracelet/bubbletea"
+	lpg "github.com/charmbracelet/lipgloss"
 )
 
 const (
@@ -29,7 +31,8 @@ func (m *GameFrame) InitCmd() {
 
 }
 
-func (m GameFrame) Init() tea.Cmd {
+func (m GameFrame) Init() tea.Cmd { 
+	
 	return nil
 }
 
@@ -53,6 +56,30 @@ func (m GameFrame) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m GameFrame) View() string {
-	s := "Press q to quit!\n"
+	//s := "Press q to quit!\n"
+	/*
+	var style  = lpg.NewStyle().
+    	Bold(true).
+    	Foreground(lpg.Color("#FAFAFA")).
+    	Background(lpg.Color("#7D56F4")).
+    	PaddingTop(2).
+    	PaddingLeft(4).
+    	Width(22)	
+	*/
+	// Set a rounded, yellow-on-purple border to the top and left
+	var style = lpg.NewStyle().
+		Width(90).
+		Height(20).
+    	BorderStyle(lpg.RoundedBorder()).
+    	BorderForeground(lpg.Color("34")).
+    	BorderBackground(lpg.Color("0")).
+    	BorderTop(true).
+    	BorderLeft(true).
+		BorderRight(true).
+		BorderBottom(true).
+		SetString("Esterian Conquest")
+
+	var s = style.Render("Hello, Commander!")
+	s += "\nCtrl-C to Quit"
 	return s
 }

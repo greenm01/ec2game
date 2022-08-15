@@ -20,11 +20,12 @@ type EC2 struct {
 func (g EC2) runGame() error {
 
 	p := tea.NewProgram(g.frame)
+	p.EnterAltScreen()	
 	if err := p.Start(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
 	}
-
+	p.ExitAltScreen()
 	return nil
 
 }

@@ -218,15 +218,11 @@ func (n *Node) renderHorizontal(modelMap map[string]tea.Model) []string {
 // returns SizeError if the area (width*height) is less or equal to zero for any node or leaf
 //
 // panics if
-//
 //   - a leaf has children
-//
 //   - a leaf has a address without a model in the ModelMap (because it was deleted)
-//
 //   - a Node (not a leaf) has no Children
 //
 //   - the SizeFunc returned a slice with different length compared to the size of the Children
-//
 //   - the combined space returned by the SizeFunc is greater than the provided size
 func (b *Boxer) UpdateSize(size tea.WindowSizeMsg) error {
 	return b.LayoutTree.updateSize(size, b.ModelMap)
