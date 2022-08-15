@@ -1,11 +1,11 @@
 package core
 
 type pos struct {
-    X int
-    Y int
+	X int
+	Y int
 }
 
 type Mission struct {
-	ID int
+	ID          int
 	Destination [2]int
 }

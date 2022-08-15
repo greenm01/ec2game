@@ -13,7 +13,7 @@ other languages. Additionally, you can use it to implement line breaking (or
 "word wrapping"), that is, to determine where text can be broken over to the
 next line when the width of the line is not big enough to fit the entire text.
 
-Grapheme Clusters
+# Grapheme Clusters
 
 Consider the rainbow flag emoji: 🏳️‍🌈. On most modern systems, it appears as one
 character. But its string representation actually has 14 bytes, so counting
@@ -25,7 +25,7 @@ The uniseg.GraphemeClusterCount(str) function will return 1 for the rainbow flag
 emoji. The Graphemes class and a variety of functions in this package will allow
 you to split strings into its grapheme clusters.
 
-Word Boundaries
+# Word Boundaries
 
 Word boundaries are used in a number of different contexts. The most familiar
 ones are selection (double-click mouse selection), cursor movement ("move to
@@ -33,7 +33,7 @@ next word" control-arrow keys), and the dialog option "Whole Word Search" for
 search and replace. This package provides methods for determining word
 boundaries.
 
-Sentence Boundaries
+# Sentence Boundaries
 
 Sentence boundaries are often used for triple-click or some other method of
 selecting or iterating through blocks of text that are larger than single words.
@@ -41,13 +41,12 @@ They are also used to determine whether words occur within the same sentence in
 database queries. This package provides methods for determining sentence
 boundaries.
 
-Line Breaking
+# Line Breaking
 
 Line breaking, also known as word wrapping, is the process of breaking a section
 of text into lines such that it will fit in the available width of a page,
 window or other display area. This package provides methods to determine the
 positions in a string where a line must be broken, may be broken, or must not be
 broken.
-
 */
 package uniseg

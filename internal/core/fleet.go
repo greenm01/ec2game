@@ -1,12 +1,12 @@
 package core
 
 type Ship struct {
-	Name string
-	Type int
-	Class int
-	Attack int
-	Defense int
-	Hull int
+	Name     string
+	Type     int
+	Class    int
+	Attack   int
+	Defense  int
+	Hull     int
 	MaxSpeed int
 }
 
@@ -36,12 +36,12 @@ type TroopTransport struct {
 }
 
 type Fleet struct {
-	ID int
-	Ships []Ship
-	Pos pos
-	Speed int
+	ID       int
+	Ships    []Ship
+	Pos      pos
+	Speed    int
 	MaxSpeed int
-	ROE int
-	ETA int
-	Orders  Mission
+	ROE      int
+	ETA      int
+	Orders   Mission
 }

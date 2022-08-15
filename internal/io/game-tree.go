@@ -1,6 +1,6 @@
 package io
 
- import (
+import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -21,6 +21,7 @@ type model struct {
 type stringer string
 
 func InitGameTree() {
+
 	// leaf content creation (models)
 	left := stringer(leftAddr)
 	middle := stringer(middleAddr)
@@ -82,7 +83,6 @@ func (m model) View() string {
 	return m.tui.View()
 }
 
-
 func (s stringer) String() string {
 	return string(s)
 }
@@ -90,4 +90,4 @@ func (s stringer) String() string {
 // satisfy the tea.Model interface
 func (s stringer) Init() tea.Cmd                           { return nil }
 func (s stringer) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return s, nil }
-func (s stringer) View() string                            { return s.String() }   
+func (s stringer) View() string                            { return s.String() }
