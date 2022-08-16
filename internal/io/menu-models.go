@@ -1,7 +1,9 @@
 package io
 
 import (
-	//"fmt"
+	"fmt"
+	
+    bx "github.com/treilik/bubbleboxer"
 	tea "github.com/charmbracelet/bubbletea"
 	lpg "github.com/charmbracelet/lipgloss"
 )
@@ -14,25 +16,27 @@ const (
 	comsBox = "coms"
 )
 
-type cmdTab interface{}
-	
 type GameFrame struct {
-	tabs map[string]cmdTab
+	tabs map[string]*bx.Boxer
+	tui *bx.Boxer
 }
 
 func (m *GameFrame) InitCmd() {
-	m.tabs = map[string]cmdTab{
-		planetBox: planetCmd{},
-		fleetBox:  fleetCmd{},
-		intelBox:  intelCmd{},
-		reportBox: reportCmd{},
-		comsBox:   comsCmd{},
+	m.tabs = map[string]*bx.Boxer{
+		planetBox: &bx.Boxer{},
+		fleetBox:  &bx.Boxer{},
+		intelBox:  &bx.Boxer{},
+		reportBox: &bx.Boxer{},
+		comsBox:   &bx.Boxer{},
 	}
 
+	initReportCmd(m.tabs[reportBox])
+	fmt.Println(m.tabs[reportBox].LayoutTree.GetAddress())
+	m.tui = m.tabs[reportBox]
+	
 }
 
 func (m GameFrame) Init() tea.Cmd { 
-	
 	return nil
 }
 
@@ -50,6 +54,9 @@ func (m GameFrame) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		}
+	
+	case tea.WindowSizeMsg:
+		m.tui.UpdateSize(msg)	
 	}
 
 	return m, nil
@@ -68,8 +75,6 @@ func (m GameFrame) View() string {
 	*/
 	// Set a rounded, yellow-on-purple border to the top and left
 	var style = lpg.NewStyle().
-		Width(90).
-		Height(20).
     	BorderStyle(lpg.RoundedBorder()).
     	BorderForeground(lpg.Color("34")).
     	BorderBackground(lpg.Color("0")).
@@ -79,7 +84,7 @@ func (m GameFrame) View() string {
 		BorderBottom(true).
 		SetString("Esterian Conquest")
 
-	var s = style.Render("Hello, Commander!")
+	var s = style.Render(m.tui.View())
 	s += "\nCtrl-C to Quit"
 	return s
 }

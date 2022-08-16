@@ -10,6 +10,9 @@ type intelCmd struct {
     text string
 }
 
+func (m intelCmd) GetTui() bx.Boxer { return m.tui }
+func (m intelCmd) InitBox() {}
+
 // satisfy the tea.Model interface
 func (b intelCmd) Init() tea.Cmd                           { return nil }
 func (b intelCmd) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return b, nil }

@@ -10,6 +10,10 @@ type fleetCmd struct {
     text string
 }
 
+func (m fleetCmd) GetTui() bx.Boxer { return m.tui }
+ 
+func (m fleetCmd) InitBox() {}
+
 // satisfy the tea.Model interface
 func (b fleetCmd) Init() tea.Cmd                           { return nil }
 func (b fleetCmd) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return b, nil }
