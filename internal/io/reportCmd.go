@@ -2,7 +2,7 @@ package io
 
 import (
     "fmt"
-    
+	    
     bx "github.com/treilik/bubbleboxer"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -26,8 +26,13 @@ func initReportCmd(m *bx.Boxer) {
 	right := stringer(rightAddr)
 
 	lower := stringer(fmt.Sprintf("%s: use ctrl+c to quit", lowerAddr))
-
+	width := func(_ bx.Node, widthOrHeight int) []int { 
+		return []int{ 12,12,12 }
+	}
 	// layout-tree defintion
+	
+	wh := tea.WindowSizeMsg{Width:45,Height:15}
+	
 	m.LayoutTree = bx.Node{
 		// orientation
 		VerticalStacked: true,
@@ -35,7 +40,8 @@ func initReportCmd(m *bx.Boxer) {
 		SizeFunc: func(_ bx.Node, widthOrHeight int) []int {
 			return []int{
 				// since this node is vertical stacked return the height partioning since the width stays for all children fixed
-				widthOrHeight - 1,
+				//widthOrHeight - 1,
+				1,
 				1,
 				// make also sure that the amount of the returned ints match the amount of children:
 				// in this case two, but in more complex cases read the amount of the chilren from the len(boxer.Node.Children)
@@ -43,7 +49,8 @@ func initReportCmd(m *bx.Boxer) {
 		},
 		Children: []bx.Node{
 			{
-				Children: []bx.Node{
+				SizeFunc: width,					
+				Children: []bx.Node {
 					// make sure to encapsulate the models into a leaf with CreateLeaf:
 					m.CreateLeaf(leftAddr, left),
 					m.CreateLeaf(middleAddr, middle),
@@ -53,6 +60,8 @@ func initReportCmd(m *bx.Boxer) {
 			m.CreateLeaf(lowerAddr, lower),
 		},
 	}
+	m.UpdateSize(wh)
+	fmt.Println(m.LayoutTree.GetWidth())
 }
 
 // satisfy the tea.Model interface

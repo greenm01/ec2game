@@ -1,8 +1,6 @@
 package io
 
 import (
-	"fmt"
-	
     bx "github.com/treilik/bubbleboxer"
 	tea "github.com/charmbracelet/bubbletea"
 	lpg "github.com/charmbracelet/lipgloss"
@@ -31,7 +29,6 @@ func (m *GameFrame) InitCmd() {
 	}
 
 	initReportCmd(m.tabs[reportBox])
-	fmt.Println(m.tabs[reportBox].LayoutTree.GetAddress())
 	m.tui = m.tabs[reportBox]
 	
 }
@@ -75,6 +72,8 @@ func (m GameFrame) View() string {
 	*/
 	// Set a rounded, yellow-on-purple border to the top and left
 	var style = lpg.NewStyle().
+		Width(45).
+		Height(15).
     	BorderStyle(lpg.RoundedBorder()).
     	BorderForeground(lpg.Color("34")).
     	BorderBackground(lpg.Color("0")).
