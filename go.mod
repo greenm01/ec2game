@@ -7,6 +7,7 @@ require (
 	github.com/charmbracelet/lipgloss v0.5.0
 	github.com/magefile/mage v1.13.0
 	github.com/treilik/bubbleboxer v0.1.0
+	golang.org/x/text v0.3.7
 )
 
 require (

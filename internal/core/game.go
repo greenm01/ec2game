@@ -19,6 +19,10 @@ type EC2 struct {
 
 func (g EC2) runGame() error {
 
+	// Setup initial command tab; defaults to Reports
+	g.frame.InitCmd()
+	
+	// Start bubbletea
 	p := tea.NewProgram(g.frame, tea.WithAltScreen())
 	if err := p.Start(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
@@ -31,7 +35,6 @@ func (g EC2) runGame() error {
 func InitGame() error {
 
 	game := EC2{frame: new(io.GameFrame)}
-	game.frame.InitCmd()
 	game.runGame()
 
 	return nil

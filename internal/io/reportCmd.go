@@ -30,9 +30,7 @@ func initReportCmd(m *bx.Boxer) {
 		return []int{ 12,12,12 }
 	}
 	// layout-tree defintion
-	
-	wh := tea.WindowSizeMsg{Width:45,Height:15}
-	
+
 	m.LayoutTree = bx.Node{
 		// orientation
 		VerticalStacked: true,
@@ -60,8 +58,7 @@ func initReportCmd(m *bx.Boxer) {
 			m.CreateLeaf(lowerAddr, lower),
 		},
 	}
-	m.UpdateSize(wh)
-	fmt.Println(m.LayoutTree.GetWidth())
+	m.UpdateSize(tea.WindowSizeMsg{Width:132,Height:37})
 }
 
 // satisfy the tea.Model interface
