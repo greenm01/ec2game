@@ -21,13 +21,11 @@ func checkWin() bool {
 // Builds the client app
 func (Build) Game() error {
 	
-	//mg.Deps(Clean)
-	
 	if err := sh.Run("go", "mod", "download"); err != nil {
 		return err
 	}
 	
-	fmt.Print("Building game...")
+	fmt.Print("Building game client...")
 	
 	if err := sh.Run("go", "build", "-ldflags", "-s -w", "./cmd/ec2g"); err != nil {
 		return err
@@ -40,8 +38,6 @@ func (Build) Game() error {
 
 // Builds the game server
 func (Build) Server() error {
-	
-	//mg.Deps(Clean)
 	
 	if err := sh.Run("go", "mod", "download"); err != nil {
 		return err
@@ -59,8 +55,6 @@ func (Build) Server() error {
 
 // Builds everything
 func (Build) All() error {
-	
-	//mg.Deps(Clean)
 	
 	if err := sh.Run("go", "mod", "download"); err != nil {
 		return err
