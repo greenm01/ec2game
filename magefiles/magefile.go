@@ -5,31 +5,95 @@ package main
 import (
 	"fmt"
 	"runtime"
+	"errors"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
 
-func checkOS() string {
-	if runtime.GOOS == "windows" {
-		return "ec2game.exe"
-	} else {
-		return "ec2game"
-	}
+type Build mg.Namespace
+
+func checkWin() bool {
+	if runtime.GOOS == "windows" { return true }
+	return false
 }
 
-func Build() error {
-	fmt.Println("Building executible...")
-	mg.Deps(Clean)
-
+// Builds the client app
+func (Build) Game() error {
+	
+	//mg.Deps(Clean)
+	
 	if err := sh.Run("go", "mod", "download"); err != nil {
 		return err
 	}
+	
+	fmt.Print("Building game...")
+	
+	if err := sh.Run("go", "build", "-ldflags", "-s -w", "./cmd/ec2g"); err != nil {
+		return err
+	}
+	
+	fmt.Println("success!")
+	return nil
+	
+}
 
-	return sh.Run("go", "build", "-ldflags", "-s -w", "./cmd/ec2game")
+// Builds the game server
+func (Build) Server() error {
+	
+	//mg.Deps(Clean)
+	
+	if err := sh.Run("go", "mod", "download"); err != nil {
+		return err
+	}
+	
+	fmt.Print("Building server...")
+	
+	if err := sh.Run("go", "build", "-ldflags", "-s -w", "./cmd/ec2s"); err != nil {
+		return err
+	}
+	
+	fmt.Println("success!")
+	return nil
+}
+
+// Builds everything
+func (Build) All() error {
+	
+	//mg.Deps(Clean)
+	
+	if err := sh.Run("go", "mod", "download"); err != nil {
+		return err
+	}
+	
+	fmt.Print("Building everything...")
+	
+	if err := sh.Run("go", "build", "-ldflags", "-s -w", "./cmd/ec2s"); err != nil {
+		return err
+	}
+	
+	if err := sh.Run("go", "build", "-ldflags", "-s -w", "./cmd/ec2g"); err != nil {
+		return err
+	}
+	
+	fmt.Println("success!")
+	return nil
+	
 }
 
 // Remove the temporarily generated files from Release.
 func Clean() error {
-	return sh.Rm(checkOS())
+	fmt.Print("Cleaning house....")
+	if checkWin() == true {
+		if sh.Rm("ec2g.exe") != nil || sh.Rm("ec2s.exe") != nil {
+			return errors.New("remove file error...")
+		}
+		fmt.Println("succes!")
+		return nil
+	}  
+	if sh.Rm("ec2g") != nil || sh.Rm("ec2s") != nil { 
+		return errors.New("remove file error...")
+	}
+	fmt.Println("success!")
+	return nil
 }
