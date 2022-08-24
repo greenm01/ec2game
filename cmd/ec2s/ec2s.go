@@ -7,90 +7,107 @@ import(
     "time"
 	"log"
 	"strings"
-	
+	"errors"
+	"io/ioutil"	
     "github.com/greenm01/ec2game/internal/server"
 	
-	"github.com/kylelemons/go-gypsy/yaml"   
+	"gopkg.in/yaml.v3"	
 )
 
-const configFile = "config.yaml"
-
-func cmdLineError() {
-	usage := "\nEsterian Conquest v2.0 GAME SERVER\n\n" +
+const (
+	configFile = "config.yaml"
+ 	exitFail = 1
+	usage = "\nEsterian Conquest v2.0 GAME SERVER\n\n" +
 	         "Usage: ec2s <command> [game path]\n\n" +
 	         "The commands are:\n\n" +
 	         "                      new            Initialize a new game\n" +
 	   	     "                      run            Start the game server\n" +
-			 "                      maint          Manually run turn maintenance\n" +
-			 "                      stats          Display game stastics\n\n" +
+			 "                      maint          Manually run turn maintenance [TODO]\n" +
+			 "                      stats          Display game stastics [TODO]\n\n" +
 	         "- Be sure to specify the game folder directory, e.g. ec2s new /User/mag/ec2/game1\n\n" +
 			 "- Ensure you drop an updated config.yaml for each new game in this folder\n" +
 		     "  > Example config.yaml, with required fields:\n" +
 			 "  > \n" + 
-		     "  > players: 4                       # Number of platers in game\n" +
+		     "  > players: 4                       # Number of players in game\n" +
 	         "  > host: Toys In The Attic BBS      # Host system name\n" +
 			 "  > sysop: Mason Austin Green        # System operator name\n" +
-			 "  > launchDate: 2022-08-23           # Day to officialy start the game: YEAR-MM-DD\n" + 
+			 "  > startDate: 2022-08-23            # Day to officialy start the game: YEAR-MM-DD\n" + 
 			 "  > maintPeriod: 24                  # Time between maintenance runs (hours) \n" +
-			 "  > ipaddress: localhost             # Your server's IP address\n" +
+			 "  > ip: localhost                    # Your server's IP address\n" +
 			 "  > port: 7777                       # Port number\n\n" +
-		     "- To delete a game, delete the folder (save the config.yaml file for later use)\n\n"
-	
-	fmt.Println(usage)
+		     "- To delete a game, delete the folder (save the config.yaml file for later use)\n"
+)	
+
+
+type ConfigData struct {
+	Players string "yaml:'players'"
+	Host string "yaml:'host'"
+	Sysop string "yaml:'sysop'"
+	StartDate string "yaml:'startDate'"
+	MaintPeriod string "yaml:'maintPeriod;"
+	IP string "yaml:'ip'"
+	Port string "yaml:'port'"		
 }
 
 func main() {
-	
-	// Verify that a subcommand has been provided
-    // os.Arg[0] is the main command
-	// os.Arg[1] is the sub command
-    if len(os.Args) != 3 {
-        cmdLineError()
-        os.Exit(1)
-    }
-	
-	path := strings.TrimSpace(os.Args[2])
-	
-	switch os.Args[1] {
-    	case "new":
-			newGame(path)		
-	    case "run":
-	        runGame(path)
-	    default:
-			cmdLineError()
-	        os.Exit(1)
-    }	
-
-	os.Exit(0)	
+	if err := run(os.Args); err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(exitFail)
+	}
 }
 
-func newGame(path string){
+func run(args []string) error {
+	if len(args) != 3 {
+		return errors.New(usage)
+    }
 	
+	path := strings.TrimSpace(args[2])
+	
+	switch args[1] {
+    	case "new":
+			return newGame(path)		
+	    case "run":
+	        return runGame(path)
+	    default:
+			return errors.New(usage)
+	}	
+
+	return nil
+}
+
+func newGame(path string) error {
+			
 	filePath := path+configFile	
-	config, err := yaml.ReadFile(filePath)
+	f, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Fatalf("readfile(%q): %s", filePath, err)
 	}
 	
-	host, _ := config.Get("host")
-	fmt.Println(host)
+	var y ConfigData
+	
+	err = yaml.Unmarshal(f,&y)
+	if err != nil {
+		log.Fatalf("cannot unmarshall data: %v",err)
+	}
+	fmt.Println(y.Host)
+	return nil
 
 }
 
-func runGame(path string){
-	initServer()
+func runGame(path string) error {
+	return initServer()
 }
 
-func initServer() {
+func initServer() error {
   
     fmt.Println("Server started.")
 
 	port := "6666"
 	listener, err_listen := net.Listen("tcp", ":" + port)
 	if err_listen != nil {
-		fmt.Println("Game server listening failed. Exit.")
-		os.Exit(1)
+		return errors.New("Game server listener failed. Exit")
 	}
+	
 	fmt.Println("Server started to listen on port " + port)
 
 	gameSpace := server.NewGameSpace()
@@ -108,5 +125,6 @@ func initServer() {
 		fmt.Println("A new connection accepted.")
 		gameSpace.Connect(conn)  
 	}  
-    
+ 
+	return nil   
 }
