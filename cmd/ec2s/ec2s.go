@@ -5,7 +5,6 @@ import(
     "net"
     "os"
     "time"
-	"flag"
 	"log"
 	"strings"
 	
@@ -16,66 +15,70 @@ import(
 
 const configFile = "config.yaml"
 
+func cmdLineError() {
+	usage := "\nEsterian Conquest v2.0 GAME SERVER\n\n" +
+	         "Usage: ec2s <command> [game path]\n\n" +
+	         "The commands are:\n\n" +
+	         "                      new            Initialize a new game\n" +
+	   	     "                      run            Start the game server\n" +
+			 "                      maint          Manually run turn maintenance\n" +
+			 "                      stats          Display game stastics\n\n" +
+	         "- Be sure to specify the game folder directory, e.g. ec2s new /User/mag/ec2/game1\n\n" +
+			 "- Ensure you drop an updated config.yaml for each new game in this folder\n" +
+		     "  > Example config.yaml, with required fields:\n" +
+			 "  > \n" + 
+		     "  > players: 4                       # Number of platers in game\n" +
+	         "  > host: Toys In The Attic BBS      # Host system name\n" +
+			 "  > sysop: Mason Austin Green        # System operator name\n" +
+			 "  > launchDate: 2022-08-23           # Day to officialy start the game: YEAR-MM-DD\n" + 
+			 "  > maintPeriod: 24                  # Time between maintenance runs (hours) \n" +
+			 "  > ipaddress: localhost             # Your server's IP address\n" +
+			 "  > port: 7777                       # Port number\n\n" +
+		     "- To delete a game, delete the folder (save the config.yaml file for later use)\n\n"
+	
+	fmt.Println(usage)
+}
+
 func main() {
 	
-	//https://www.rapid7.com/blog/post/2016/08/04/build-a-simple-cli-tool-with-golang/	// Subcommands
-	// TODO: https://lightstep.com/blog/getting-real-with-command-line-arguments-and-goflags    
-	
-	newGameCmd := flag.NewFlagSet("new", flag.ExitOnError)
-    runGameCmd := flag.NewFlagSet("run", flag.ExitOnError)	
-
-	pathNew := newGameCmd.String("path", "", "Game directory path")
-	pathRun := runGameCmd.String("path", "", "Game directory path")
-	var path string
-		
 	// Verify that a subcommand has been provided
     // os.Arg[0] is the main command
 	// os.Arg[1] is the sub command
-    if len(os.Args) < 2 {
-        fmt.Println("'new' or 'run' command is required")
+    if len(os.Args) != 3 {
+        cmdLineError()
         os.Exit(1)
-    }	
+    }
+	
+	path := strings.TrimSpace(os.Args[2])
 	
 	switch os.Args[1] {
     	case "new":
-        	newGameCmd.Parse(os.Args[2:])
+			newGame(path)		
 	    case "run":
-	        runGameCmd.Parse(os.Args[2:])
+	        runGame(path)
 	    default:
-	        flag.PrintDefaults()
+			cmdLineError()
 	        os.Exit(1)
     }	
+
+	os.Exit(0)	
+}
+
+func newGame(path string){
 	
-	if newGameCmd.Parsed() {
-		if len(*pathNew) == 0 {
-			newGameCmd.PrintDefaults()
-			os.Exit(1)
-		}
-		path = *pathNew	
-	} else if runGameCmd.Parsed() {
-		if len(*pathRun) == 0 {
-			runGameCmd.PrintDefaults()
-			os.Exit(1)
-		}
-		path = *pathRun		
-	} else {
-		// error
-	}
-	
-	
-	//command := os.Args[0]
-	
-	filePath := strings.TrimSpace(path)+configFile	
+	filePath := path+configFile	
 	config, err := yaml.ReadFile(filePath)
 	if err != nil {
 		log.Fatalf("readfile(%q): %s", filePath, err)
 	}
 	
-	welcome, _ := config.Get("welcome")
-	fmt.Println(welcome)
+	host, _ := config.Get("host")
+	fmt.Println(host)
 
+}
+
+func runGame(path string){
 	initServer()
-	
 }
 
 func initServer() {

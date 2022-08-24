@@ -1,10 +1,10 @@
 # Esterian Conquest: game setup configuration
 
-players: 4                       # Number of platers in game
+players: 4                       # Number of players in game
 host: Toys In The Attic BBS      # Host system name  
 sysop: Mason Austin Green        # System operator name
 launchDate: 2022-08-23           # Day to officialy start the game: YEAR-MM-DD 
-maintPeriod: 24                  # Time between maintnance runs (hours)
+maintPeriod: 24                  # Time between maintenance runs (hours)
+ipaddress: localhost             # Server's IP address
+port: 7777                       # Port nummber
 
-# Initial welcome message
-welcome: Welcome to Esterian Conquest v2.0... Let's get it on!
