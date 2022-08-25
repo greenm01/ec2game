@@ -3,6 +3,7 @@ package core
 import (
     "time"
     "sync"
+    "os"
     "encoding/gob"
 )
 
@@ -22,7 +23,7 @@ func saveGameData(filePath string, gd GameData) error {
     defer lock.Unlock()    
     
     file, err := os.Create(filePath)
-    defer file.close()
+    defer file.Close()
     if err == nil {
         encoder := gob.NewEncoder(file)
         err = encoder.Encode(gd)
@@ -35,7 +36,7 @@ func loadGameData(filePath string, gd GameData) error {
     lock.Lock()
     defer lock.Unlock()
     
-    file, err := os.Open(filePath)i
+    file, err := os.Open(filePath)
     defer file.Close()
     if err == nil {
         decoder := gob.NewDecoder(file)

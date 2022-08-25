@@ -1,5 +1,22 @@
 package main
 
+/* TODO: 1) Consider switching config file to 
+            NestedText format
+		 2) Setup game data, save to database
+         3) Enable new players to join before game launch
+
+  NOTES:
+
+		 1) For the BBS client, consider sticking with the 
+            classic EC game menu formating, ANSI compliant.
+	        This will anable playtesting of the core game 
+		    without spending too much time developing a nice 
+            "modern" UI
+         2) Once the core game is stable, donsider a new command 
+            dashboard client for a terminal based game (not BBS)
+            that is UTF-8 compliant.
+*/
+
 import(
     "fmt"
     "net"
@@ -9,7 +26,8 @@ import(
 	"strings"
 	"errors"
 	"io/ioutil"	
-    "github.com/greenm01/ec2game/internal/server"
+    
+	"github.com/greenm01/ec2game/internal/server"
 	
 	"gopkg.in/yaml.v3"	
 )
@@ -90,6 +108,7 @@ func newGame(path string) error {
 		log.Fatalf("cannot unmarshall data: %v",err)
 	}
 	fmt.Println(y.Host)
+	NewGameSetup(y)
 	return nil
 
 }

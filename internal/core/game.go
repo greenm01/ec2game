@@ -39,3 +39,4 @@ func InitGame() error {
 
 	return nil
 }
+
