@@ -1,47 +1,39 @@
 package core
 
+// Ship Classes:
+// 01 = Destroyer
+// 02 = Cruiser
+// 03 = Battleship
+// 04 = Scout
+// 05 = Troop Transport
+// 06 = ETAC
+
 type Ship struct {
-	Name     string
-	Type     int
-	Class    int
-	Attack   int
-	Defense  int
-	Hull     int
-	MaxSpeed int
-}
-
-type Destroyer struct {
-	Ship
-}
-
-type Scout struct {
-	Ship
-}
-
-type Cruiser struct {
-	Ship
-}
-
-type Battleship struct {
-	Ship
-}
-
-type ETAC struct {
-	Ship
-}
-
-type TroopTransport struct {
-	Ship
-	AR int 						// Armies
+	ID    int
+	Class int
+	AR    int
 }
 
 type Fleet struct {
 	ID       int
 	Ships    []Ship
-	Pos      XY
+	Pos      int
 	Speed    int
 	MaxSpeed int
 	ROE      int
 	ETA      int
-	Orders   Mission
+	Orders   int
+}
+
+func (f *Fleet) Armies() int {
+	a := 0
+	for i, s := range f.Ships {
+		// Only troop transports can have armies!
+		if s.Class == 5 {
+			a += s.AR
+		} else {
+			f.Ships[i].AR = 0
+		}
+	}
+	return a
 }

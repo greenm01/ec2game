@@ -18,6 +18,22 @@ func checkWin() bool {
 	return false
 }
 
+func Run() error {
+	
+	if err := sh.Run("go", "mod", "download"); err != nil {
+		return err
+	}
+	
+	fmt.Print("Run server client...")
+	
+	if err := sh.Run("go", "run", "./cmd/ec2s"); err != nil {
+		return err
+	}
+	
+	fmt.Println("success!")
+	return nil
+}
+
 // Builds the client app
 func (Build) Game() error {
 	

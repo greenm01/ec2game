@@ -21,7 +21,7 @@ func (g EC2) runGame() error {
 
 	// Setup initial command tab; defaults to Reports
 	g.frame.InitCmd()
-	
+
 	// Start bubbletea
 	p := tea.NewProgram(g.frame, tea.WithAltScreen())
 	if err := p.Start(); err != nil {
@@ -39,4 +39,3 @@ func InitGame() error {
 
 	return nil
 }
-

@@ -1,52 +1,101 @@
 package main
 
 import (
-	"fmt"
 	"errors"
-	"strconv"
+	"fmt"
 	"github.com/greenm01/ec2game/internal/core"
+	"strconv"
+	"time"
 )
 
-/* TODO: 1) Generate Starmap based on # of players
-         2) Setup NPC rogue empires
-	     3) Save data to databse (create db package)
-		 4) Place server game-state in standby, waiting for 
+type Ship = core.Ship
+
+/* TODO: * Save data to databse (create db package)
+		 * Place server game-state in standby, waiting for
             new players to join
 */
 
-func NewGameSetup(config ConfigData) error {
+func newGameSetup(config map[string]interface{}) error {
 
-	// Number of players
-    np,err := strconv.Atoi(config.Players)
-    
-    if err != nil || np < 2 {
-        e := "\nError! Minimum number of players is 2.\n" +
-             "Fix the configuration file.\n"
-        return errors.New(e)
-    }	
-
-    /* #############################
-       ##### STARMAP & PLANETS #####
-       ############################# */   	
-	
 	fmt.Println("\n############################")
 	fmt.Println("#### Creating New Game #####")
 	fmt.Println("############################")
+
+	// Number of players
 	
-	starMap := core.StarMap{}
-	starMap.InitMap(np)
+	np := config["players"].(int)
+	if np < 2 {
+		e := "\nError! Minimum number of players is 2.\n" +
+			"Fix the configuration file.\n"
+		return errors.New(e)
+	}
+
+	/* #############################
+	   ##### STARMAP & PLANETS #####
+	   ############################# */
+
+	starMap := &core.StarMap{}
+	if err := starMap.InitMap(np); err != nil {
+		return err
+	}
 
 	/* #########################
-       ##### PLAYER SETUP  #####
-       ######################### */   	
-	
-	players := make(map[int]*core.Player)
+	   ##### PLAYER SETUP  #####
+	   ######################### */
 
-	for i,hw := range starMap.HomeWorlds {
-		players[i] = &core.Player{UID:i}
-		name := "Rogue " + strconv.Itoa(i)
-		players[i].InitPlayer(name, hw)
-	}		
+	empires := make(map[int]*core.Empire)
+
+	// Create players & assign homeworlds 
+	for i, hw := range starMap.HomeWorlds {
+		empires[i] = &core.Empire{UID: i,
+			Name: "Rogue " + strconv.Itoa(i),
+			Planets:    []int{hw},
+			TaxRate:    50.0,
+		}
+		// Allocate resources to homeworld
+		starMap.Planets[hw].InitHomeworld(i)
+	}
+
+	/*	## Assign fleets #####################################
+	   	# Per classic EC, each empire get 4 starting fleets: #
+	   	# - Two Fleets with one ETAC and a Cruiser escort    #
+	   	# - Two Fleets with one Destroyers                   #
+	   	# - Orders are to guard/blockade homeworld           #
+		###################################################### 
+	*/ 
+
+	fmt.Print("...\nAssigning fleets...")
+	for _, p := range empires {
+		p.Fleets = make(map[int]*core.Fleet)
+		// Create fleets
+		for f := 0; f < 4; f++ {
+			p.Fleets[f] = &core.Fleet{ID: f,
+				Pos:    p.Planets[0],
+				ROE:    6,
+				Speed:  0,
+				ETA:    0,
+				Orders: 5,
+			}
+		}
+
+		// Assign starting ships
+		p.Fleets[0].Ships = []Ship{Ship{ID: 1, Class: 2},
+			Ship{ID: 2, Class: 6}}
+
+		p.Fleets[1].Ships = []Ship{Ship{ID: 3, Class: 2},
+			Ship{ID: 4, Class: 6}}
+
+		p.Fleets[2].Ships = []Ship{Ship{ID: 5, Class: 1}}
+
+		p.Fleets[3].Ships = []Ship{Ship{ID: 6, Class: 1, AR:2}}
+	}
 	
-	return err
+	fmt.Println("done!")
+
+	gs := &gameState{LaunchTime: config["launchTime"].(time.Time), 
+		             StarMap: starMap, Empires: empires}
+
+	fmt.Println("Launch date & time set to ",gs.LaunchTime)
+	
+	return nil
 }

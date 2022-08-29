@@ -1,5 +1,5 @@
 package core
 
 type Report struct {
-    text string
+	text string
 }

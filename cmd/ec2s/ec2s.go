@@ -58,12 +58,14 @@ const (
 )	
 
 
-type ConfigData struct {
-	Players string "yaml:'players'"
+type configData struct {
+	Players int "yaml:'players'"
 	Host string "yaml:'host'"
 	Sysop string "yaml:'sysop'"
-	StartDate string "yaml:'startDate'"
-	MaintPeriod string "yaml:'maintPeriod;"
+	LaunchDate time.Time "yaml:'launchDate'"
+	LaunchTime time.Time "yaml:'launchTime'"
+	MaintPeriod string "yaml:'maintPeriod'"
+	MaintTime string "yaml:'mainTime'"
 	IP string "yaml:'ip'"
 	Port string "yaml:'port'"		
 }
@@ -102,13 +104,22 @@ func newGame(path string) error {
 		log.Fatalf("readfile(%q): %s", filePath, err)
 	}
 	
-	var y ConfigData
-	
+	y := make(map[string]interface{})
+
 	err = yaml.Unmarshal(f,&y)
 	if err != nil {
 		log.Fatalf("cannot unmarshall data: %v",err)
 	}
-	return NewGameSetup(y)
+	
+	// TODO: validate other fields
+	switch y["players"].(type) {
+	case int:
+		break
+	default:
+		return errors.New("Invalid config file!")
+	}
+
+	return newGameSetup(y)
 }
 
 func runGame(path string) error {
