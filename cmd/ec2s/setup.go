@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"errors"
+	"strconv"
 	"github.com/greenm01/ec2game/internal/core"
 )
 
@@ -12,6 +15,38 @@ import (
 */
 
 func NewGameSetup(config ConfigData) error {
-	sm := core.StarMap{}
-	return sm.Init(4)
+
+	// Number of players
+    np,err := strconv.Atoi(config.Players)
+    
+    if err != nil || np < 2 {
+        e := "\nError! Minimum number of players is 2.\n" +
+             "Fix the configuration file.\n"
+        return errors.New(e)
+    }	
+
+    /* #############################
+       ##### STARMAP & PLANETS #####
+       ############################# */   	
+	
+	fmt.Println("\n############################")
+	fmt.Println("#### Creating New Game #####")
+	fmt.Println("############################")
+	
+	starMap := core.StarMap{}
+	starMap.InitMap(np)
+
+	/* #########################
+       ##### PLAYER SETUP  #####
+       ######################### */   	
+	
+	players := make(map[int]*core.Player)
+
+	for i,hw := range starMap.HomeWorlds {
+		players[i] = &core.Player{UID:i}
+		name := "Rogue " + strconv.Itoa(i)
+		players[i].InitPlayer(name, hw)
+	}		
+	
+	return err
 }

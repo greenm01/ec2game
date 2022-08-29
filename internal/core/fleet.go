@@ -32,13 +32,13 @@ type ETAC struct {
 
 type TroopTransport struct {
 	Ship
-	Armies []Army
+	AR int 						// Armies
 }
 
 type Fleet struct {
 	ID       int
 	Ships    []Ship
-	Pos      pos
+	Pos      XY
 	Speed    int
 	MaxSpeed int
 	ROE      int

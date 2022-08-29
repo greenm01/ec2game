@@ -1,55 +1,125 @@
 package core
 
 import (
-    "errors"
-    "math/rand"
     "time"
+    "math/rand"
+    "math"
     "fmt"
+    
+    pd "github.com/fogleman/poissondisc"
+	km "github.com/mash/gokmeans"
+)
+
+const (
+    maxp = 150            // Max planet production
+    minp = 10             // Minimum planet production
 )
 
 type StarMap struct {
-    Planets map[string]Planet
+    Planets map[int]Planet
+    GridSize int
     Systems []int
-    
+    HomeWorlds []int
 }
 
-// Return x,y coordinates of grid position
-func GridPos(l int, grid int) (int, int) {
-    return (l-1)%grid, (l-1)/grid
+// Return x,y grid coordinates of cell number
+// Cell 1 starts at (0,0)
+func GridPos(c int, grid int) (int, int) {
+    return (c-1)%grid, (c-1)/grid
 }
 
-// Init: create starmap based on number of players
-func (s *StarMap) Init(nPlayers int) error {
-    var grid int
-        
-    // Map size based on number of players
-    switch nPlayers {
-    case 4:
-        grid = 18
-    case 9:
-        grid = 27
-    case 16:
-        grid = 36
-    case 25:
-        grid = 45
-    default:
-        return errors.New("Invalid number of players; limited to 4,9,16,25")        
+// Return the cell number of given x,y coordinates
+// (0,0) starts at cell 1
+func CellPos(grid int, x int, y int) int {
+    return grid*y+x+1
+} 
+
+// kMeans: k-means clustering (LLoyd's algo) to find optimal
+// distribution of homeworlds.
+func kMeans(sys []km.Node, np int, gs float64) [][]int {
+     
+    // Generate our centroid seeds
+    cg := gs/2
+    seed := make([]km.Node, np)
+    for i,_ := range seed {
+        seed[i] = []float64{cg,cg}
     }
     
-    // Number of planets is five times the number players
-    // TODO: Make nPlanets configurable
-    nPlanets := nPlayers * 5   
-    s.Systems = make([]int, nPlanets)
+    // Get a list of centroid clusters
+    _, centroids := km.Train2(sys, -1, 50, seed)
     
-    // Random set of unque locations    
-    rand.Seed(time.Now().UnixNano())
-    p := rand.Perm(grid*grid)
-    for i, r := range p[:nPlanets] {
-        s.Systems[i] = r
-        x,y := GridPos(r,grid)
-        fmt.Println(r,":(",x,",",y,")")
-    } 
-              
-    return nil   
+    fmt.Println("...\nFinding homeworlds:")
+	
+    hw := make([][]int, np)
+    for i, cent := range centroids {
+		n := km.Nearest(cent, sys)
+        hw[i] = []int{ int(sys[n][0]), int(sys[n][1]) } 
+	}	
+    
+    fmt.Println(hw)
         
+    return hw
+    
+}
+
+func (s StarMap) NumPlanets() int {
+    return len(s.Systems)
+}
+
+// Init: Setup the game's starmap and planets
+func (s *StarMap) InitMap(np int) {
+           
+    // Starmap size bound by number of players
+    // Linear regression of original EC map sizing is approx:
+    // [4:18x18, 9:27x27, 16:36x36, 25:45x45]
+    // y = 1.27x + 14.42
+    // We want some extra room and a more planets
+    r := 1.5*float64(np) + 15
+    // Round to nearest even number.  
+    s.GridSize = int(math.RoundToEven(math.Floor(r)+0.5))
+    s.Planets = make(map[int]Planet)
+   
+    // Generate starmap based on a random Poisson distribution
+    // This generates a much nicer distribution over a pure random set
+    // http://devmag.org.za/2009/05/03/poisson-disk-sampling/    
+    // Minimum distance between systems is PI. Why not?
+    
+    gs := float64(s.GridSize)
+    points := pd.Sample(0, 0, gs, gs, math.Pi, 32, nil)
+    nodes := make([]km.Node, len(points)-1)
+    s.Systems = make([]int, len(nodes))
+    
+    // Seed the random number generator with system time
+    rnd := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))    
+    
+    for i, p := range points[1:] {
+        x := int(math.RoundToEven(p.X))
+        y := int(math.RoundToEven(p.Y))
+        nodes[i] = []float64{p.X, p.Y}
+        c := CellPos(s.GridSize, x, y)
+        s.Systems[i] = c    
+        s.Planets[c] = Planet { 
+                                ID: c, 
+                                Pos: XY{x, y}, 
+                                MaxProd: rnd.Intn(maxp-minp)+minp,
+                                Name: "nameless",
+                              }
+    }
+    
+    ppp := fmt.Sprintf("%.2f", float64(s.NumPlanets())/float64(np))    
+    
+    fmt.Println("...\nGenerating starmap:")
+    fmt.Println("Grid size          =", gs, "x", gs)
+    fmt.Println("Number of players  =", np)
+    fmt.Println("Number of planets  =", s.NumPlanets())  
+    fmt.Println("Planets per player =", ppp)
+
+    // Employ k-means clustering to find homewords
+    hw := kMeans(nodes, np, gs)
+    
+    s.HomeWorlds = make([]int, np)    
+    for i,h := range hw {
+        s.HomeWorlds[i] = CellPos(s.GridSize,h[0],h[1])
+    }
+    
 }

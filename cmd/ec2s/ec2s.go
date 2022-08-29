@@ -33,6 +33,7 @@ import(
 )
 
 const (
+	
 	configFile = "config.yaml"
  	exitFail = 1
 	usage = "\nEsterian Conquest v2.0 GAME SERVER\n\n" +
@@ -107,10 +108,7 @@ func newGame(path string) error {
 	if err != nil {
 		log.Fatalf("cannot unmarshall data: %v",err)
 	}
-	fmt.Println(y.Host)
-	NewGameSetup(y)
-	return nil
-
+	return NewGameSetup(y)
 }
 
 func runGame(path string) error {

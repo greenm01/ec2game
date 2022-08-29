@@ -1,30 +1,20 @@
 package core
 
-type Army struct {
-	Attack  int
-	Defense int
-	Health  int
-}
 
-type groundBattery struct {
-	Attack  int
-	Defense int
-	Health  int
-}
-
-type starDock struct {
-	Ships  []Ship
-	Armies []Army
+type StarDock struct {
+	Ships  []Ship				// Stardock contents
+	AR int						// Armies
 }
 
 type Planet struct {
-	Pos           pos
-	Name          string
-	Owner         string
-	MaxProduction int
-	CurProduction int
-	storedPoints  int
-	AR            []Army
-	GB            []groundBattery
-	Dock          starDock
+	ID			  int			// Internal ID
+	Pos           XY			// Starmap position
+	Name          string		// Planet's name
+	Owner         string		// Current owner
+	MaxProd 	  int			// Max production
+	CurProd 	  int			// Current production
+	BTC  		  int			// Bitcoin stored
+	AR            int			// Armies
+	GB            int			// Ground batteries
+	Dock          StarDock		// Stardock
 }

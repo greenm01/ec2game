@@ -1,6 +1,6 @@
 package core
 
-type pos struct {
+type XY struct {
 	X int
 	Y int
 }
