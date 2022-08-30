@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/greenm01/ec2game/internal/core"
 	"strconv"
-	"time"
 )
 
 type Ship = core.Ship
@@ -15,15 +14,15 @@ type Ship = core.Ship
             new players to join
 */
 
-func newGameSetup(config map[string]interface{}) error {
+func newGameSetup(config configData) error {
 
-	fmt.Println("\n############################")
-	fmt.Println("#### Creating New Game #####")
-	fmt.Println("############################")
+	fmt.Println("\n################################")
+	fmt.Println("##### Creating New EC Game #####")
+	fmt.Println("################################")
 
 	// Number of players
 	
-	np := config["players"].(int)
+	np := int(config.Players)
 	if np < 2 {
 		e := "\nError! Minimum number of players is 2.\n" +
 			"Fix the configuration file.\n"
@@ -92,10 +91,14 @@ func newGameSetup(config map[string]interface{}) error {
 	
 	fmt.Println("done!")
 
-	gs := &gameState{LaunchTime: config["launchTime"].(time.Time), 
-		             StarMap: starMap, Empires: empires}
+	gs := &gameState{Config: &config, StarMap: starMap, Empires: empires}
 
-	fmt.Println("Launch date & time set to ",gs.LaunchTime)
+	startDate := config.LaunchDate.Format("2006-01-02")
+	maintTime := config.MaintTime.Format("15:04")
+	
+	fmt.Println("Launch date & time set to", startDate, "@", maintTime)
+	
+	gs.Started = false
 	
 	return nil
 }

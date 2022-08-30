@@ -22,19 +22,16 @@ import(
     "net"
     "os"
     "time"
-	"log"
 	"strings"
 	"errors"
-	"io/ioutil"	
-    
+	    
 	"github.com/greenm01/ec2game/internal/server"
 	
-	"gopkg.in/yaml.v3"	
 )
 
 const (
 	
-	configFile = "config.yaml"
+	configFile = "config.nt"
  	exitFail = 1
 	usage = "\nEsterian Conquest v2.0 GAME SERVER\n\n" +
 	         "Usage: ec2s <command> [game path]\n\n" +
@@ -56,19 +53,6 @@ const (
 			 "  > port: 7777                       # Port number\n\n" +
 		     "- To delete a game, delete the folder (save the config.yaml file for later use)\n"
 )	
-
-
-type configData struct {
-	Players int "yaml:'players'"
-	Host string "yaml:'host'"
-	Sysop string "yaml:'sysop'"
-	LaunchDate time.Time "yaml:'launchDate'"
-	LaunchTime time.Time "yaml:'launchTime'"
-	MaintPeriod string "yaml:'maintPeriod'"
-	MaintTime string "yaml:'mainTime'"
-	IP string "yaml:'ip'"
-	Port string "yaml:'port'"		
-}
 
 func main() {
 	if err := run(os.Args); err != nil {
@@ -98,28 +82,10 @@ func run(args []string) error {
 
 func newGame(path string) error {
 			
-	filePath := path+configFile	
-	f, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		log.Fatalf("readfile(%q): %s", filePath, err)
-	}
-	
-	y := make(map[string]interface{})
+	config, err := loadConfig(path); 
+	if err != nil { return err	}
 
-	err = yaml.Unmarshal(f,&y)
-	if err != nil {
-		log.Fatalf("cannot unmarshall data: %v",err)
-	}
-	
-	// TODO: validate other fields
-	switch y["players"].(type) {
-	case int:
-		break
-	default:
-		return errors.New("Invalid config file!")
-	}
-
-	return newGameSetup(y)
+	return newGameSetup(config)
 }
 
 func runGame(path string) error {
@@ -156,3 +122,4 @@ func initServer() error {
  
 	return nil   
 }
+
