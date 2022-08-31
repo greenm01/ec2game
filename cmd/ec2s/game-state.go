@@ -5,8 +5,8 @@ import (
 )
 
 type gameState struct {
-    Started bool
-    Config *configData
-    StarMap *core.StarMap
-    Empires map[int]*core.Empire
+	Started bool
+	Config  *configData
+	StarMap *core.StarMap
+	Empires map[int]*core.Empire
 }

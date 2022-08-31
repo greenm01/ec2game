@@ -1,10 +1,10 @@
-package io 
+package io
 
 import (
-    "fmt"
-	    
-    bx "github.com/treilik/bubbleboxer"
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
+	bx "github.com/treilik/bubbleboxer"
 )
 
 const (
@@ -15,19 +15,19 @@ const (
 )
 
 type reportCmd struct {
-    text string
+	text string
 }
 
 func initReportCmd(m *bx.Boxer) {
-	
+
 	// leaf content creation (models)
 	left := stringer(leftAddr)
 	middle := stringer(middleAddr)
 	right := stringer(rightAddr)
 
 	lower := stringer(fmt.Sprintf("%s: use ctrl+c to quit", lowerAddr))
-	width := func(_ bx.Node, widthOrHeight int) []int { 
-		return []int{ 12,12,12 }
+	width := func(_ bx.Node, widthOrHeight int) []int {
+		return []int{12, 12, 12}
 	}
 	// layout-tree defintion
 
@@ -47,8 +47,8 @@ func initReportCmd(m *bx.Boxer) {
 		},
 		Children: []bx.Node{
 			{
-				SizeFunc: width,					
-				Children: []bx.Node {
+				SizeFunc: width,
+				Children: []bx.Node{
 					// make sure to encapsulate the models into a leaf with CreateLeaf:
 					m.CreateLeaf(leftAddr, left),
 					m.CreateLeaf(middleAddr, middle),
@@ -58,13 +58,13 @@ func initReportCmd(m *bx.Boxer) {
 			m.CreateLeaf(lowerAddr, lower),
 		},
 	}
-	m.UpdateSize(tea.WindowSizeMsg{Width:132,Height:37})
+	m.UpdateSize(tea.WindowSizeMsg{Width: 132, Height: 37})
 }
 
 // satisfy the tea.Model interface
-func (b reportCmd) Init() tea.Cmd { return nil }
+func (b reportCmd) Init() tea.Cmd                           { return nil }
 func (b reportCmd) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return b, nil }
-func (b reportCmd) View() string { return b.text }
+func (b reportCmd) View() string                            { return b.text }
 
 type stringer string
 

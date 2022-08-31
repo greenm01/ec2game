@@ -4,7 +4,7 @@
 
 ### Initial game setup. Immutable after game start  ###
 
-players: 9
+players: 25
 host: Toys In The Attic BBS                         
 sysop: Mason Austin Green        
 launchDate: 2022-09-01
@@ -22,15 +22,15 @@ port: 1992
 
 ### Initial game setup. Immutable after game start  ###
 #
-# players: 4                       # Number of players in game
-# host: Toys In The Attic BBS      # Host system name  
-# sysop: Mason Austin Green        # System operator name
-# launchTime: 2022-08-23 00:30:00  # Game launch, local machine time (YEAR-MM-DD 00:00:00) 
-# ip: localhost                    # Server's IP address
-# port: 1992                       # Port nummber
+# players: 4                     # Number of players in game
+# host: Toys In The Attic BBS    # Host system name  
+# sysop: Mason Austin Green      # System operator name
+# launchDate: 2022-08-23         # Game launch (YEAR-MM-DD) 
 #
 ### Configurable during gameplay
 #
-# maintTime: 00:00:00              # First daily maintenance time (24hr format)
-# maintPeriod: 24                  # Time between maintenance runs (hours)
-
+# maintTime: 00:00        # Daily mainenance time (HH:MM)
+# maintPeriod: 24         # Time between maintenance runs (hours). Max 24/day
+# ip: localhost           # Server's IP address
+# port: 1992              # Port nummber
+#

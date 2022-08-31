@@ -1,26 +1,26 @@
 package server
 
 import (
-	"fmt"
 	"bufio"
-	"net"
-	"time"
-	"sync"
+	"fmt"
 	"io"
+	"net"
+	"sync"
+	"time"
 )
 
 type Session struct {
-	sid int
-	gameSpace *GameSpace
-	connection net.Conn
-	incoming chan string
-	outgoing chan string
-	reader   *bufio.Reader
-	writer   *bufio.Writer
-	killRoomConnGoroutine chan bool
+	sid                       int
+	gameSpace                 *GameSpace
+	connection                net.Conn
+	incoming                  chan string
+	outgoing                  chan string
+	reader                    *bufio.Reader
+	writer                    *bufio.Writer
+	killRoomConnGoroutine     chan bool
 	killSocketReaderGoroutine chan bool
 	killSocketWriterGoroutine chan bool
-	sessionMutex sync.Mutex
+	sessionMutex              sync.Mutex
 }
 
 func NewSession(sid int, gameSpace *GameSpace, connection net.Conn) *Session {
@@ -28,17 +28,17 @@ func NewSession(sid int, gameSpace *GameSpace, connection net.Conn) *Session {
 	reader := bufio.NewReader(connection)
 
 	s := &Session{
-		sid: sid,
-		gameSpace: gameSpace,
-		connection: connection,
-		incoming: make(chan string),
-		outgoing: make(chan string),
-		reader: reader,
-		writer: writer,
-		killRoomConnGoroutine: make(chan bool),
+		sid:                       sid,
+		gameSpace:                 gameSpace,
+		connection:                connection,
+		incoming:                  make(chan string),
+		outgoing:                  make(chan string),
+		reader:                    reader,
+		writer:                    writer,
+		killRoomConnGoroutine:     make(chan bool),
 		killSocketReaderGoroutine: make(chan bool),
 		killSocketWriterGoroutine: make(chan bool),
-//		sessionMutex: 
+		//		sessionMutex:
 	}
 	fmt.Println("A new session created. sid=", sid)
 	return s
@@ -58,7 +58,7 @@ func (s *Session) Read() {
 					fmt.Println("Client disconnected. Destroy session, sid=", s.sid)
 					s.LeaveAndDelete()
 				}
-				
+
 				// else:
 				fmt.Println("bufio.reader.ReadString failed.")
 				fmt.Println(err)
@@ -70,7 +70,7 @@ func (s *Session) Read() {
 	}
 }
 
-func (s *Session) Write() {	
+func (s *Session) Write() {
 	for {
 		select {
 		case <-s.killSocketWriterGoroutine:
@@ -89,35 +89,35 @@ func (s *Session) Listen() {
 
 func (s *Session) LeaveAndDelete() {
 	// leave
-	
+
 	gameSpace := *s.gameSpace
 	sid := s.sid
 	gameSpace.roomMutex.Lock()
 	defer gameSpace.roomMutex.Unlock()
 	delete(gameSpace.sessions, sid)
-	
+
 	// delete
-	
+
 	s.sessionMutex.Lock()
 	defer s.sessionMutex.Unlock()
-	
+
 	// release resources
-	
+
 	// resouce: socket reader goroutine & socket writer goroutine
 	s.killSocketReaderGoroutine <- true
 	s.killSocketWriterGoroutine <- true
-	
+
 	// resource: reader & writer
 	s.reader = nil
 	s.writer = nil
-	
+
 	// resource: socket conection
 	s.connection.Close()
 	s.connection = nil
-	
+
 	// resource: RoomConnGoroutine
 	s.killRoomConnGoroutine <- true
-	
+
 	// resource: connection to gameSpace
 	// "many in, one out" 형태의 'gameSpace'의(!) channel 이기에 지워야할 채널(RoomConn)이 사실은 존재하지 않는다. (위에서) 해당 goroutine 지워줬으니 끝.
 }

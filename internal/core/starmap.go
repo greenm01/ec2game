@@ -1,11 +1,11 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"math/rand"
 	"time"
-	"errors"
 
 	pd "github.com/fogleman/poissondisc"
 	km "github.com/mash/gokmeans"
@@ -39,25 +39,19 @@ func CellPos(grid int, x int, y int) int {
 // distribution of homeworlds.
 func kMeans(sys []km.Node, np int, gs float64) [][]int {
 
-	// Generate our centroid seeds
-	cg := gs / 2
-	seed := make([]km.Node, np)
-	for i, _ := range seed {
-		seed[i] = []float64{cg, cg}
-	}
+	fmt.Print("...\nFinding homeworlds...")
 
 	// Get a list of centroid clusters
-	_, centroids := km.Train2(sys, -1, 50, seed)
-
-	fmt.Println("...\nFinding homeworlds:")
+	_, centroids := km.Train(sys, np, 50)
 
 	hw := make([][]int, np)
 	for i, cent := range centroids {
-		n := km.Nearest(cent, sys)
-		hw[i] = []int{int(sys[n][0]), int(sys[n][1])}
+		//n := km.Nearest(cent, sys)
+		//hw[i] = []int{int(sys[n][0]), int(sys[n][1])}
+		hw[i] = []int{int(cent[0]), int(cent[1])}
 	}
 
-	fmt.Println(hw)
+	fmt.Println("done!")
 
 	return hw
 
@@ -70,41 +64,31 @@ func (s StarMap) NumPlanets() int {
 // Init: Setup the game's starmap and planets
 func (s *StarMap) InitMap(np int) error {
 
-	// Starmap size bound by number of players
-	// Linear regression of original EC map sizing is approx:
+	// Classic EC starmap size bound by number of players:
 	// [4:18x18, 9:27x27, 16:36x36, 25:45x45]
-	// y = 1.27x + 14.42
-	// We want some extra room and a more planets
-	r := 1.5*float64(np) + 15
-	// Round to nearest even number.
-	s.GridSize = int(math.RoundToEven(math.Floor(r) + 0.5))
-	s.Planets = make(map[int]*Planet)
+	// Nonlinar power regression gives us a nice distribution
+	// f(x) = 9*x^(-0.5)
+	// https://www.desmos.com/calculator/9itjhjdmig
+	r := 9 * math.Pow(float64(np), 0.5)
+	s.GridSize = int(math.Ceil(r))
 
 	// Generate starmap based on a random Poisson distribution
 	// This generates a much nicer distribution over a pure random set
 	// http://devmag.org.za/2009/05/03/poisson-disk-sampling/
-	// Minimum distance between systems is PI. Why not?
+	// Minimum distance between systems is PI, which lends to approx
+	// 5-6 planets per player.
 
 	gs := float64(s.GridSize)
-	points := pd.Sample(0, 0, gs, gs, math.Pi, 32, nil)
-	nodes := make([]km.Node, len(points)-1)
+	points := pd.Sample(0, 0, gs, gs, math.Pi, 50, nil)
+	nodes := make([]km.Node, len(points))
 	s.Systems = make([]int, len(nodes))
 
-	// Seed the random number generator with system time
-	rnd := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
-
-	for i, p := range points[1:] {
-		x := math.RoundToEven(p.X)
-		y := math.RoundToEven(p.Y)
-		nodes[i] = []float64{x,y}
+	for i, p := range points {
+		x := math.Floor(p.X)
+		y := math.Floor(p.Y)
+		nodes[i] = []float64{x, y}
 		c := CellPos(s.GridSize, int(x), int(y))
 		s.Systems[i] = c
-		s.Planets[c] = &Planet{
-			ID:      c,
-			Pos:     XY{int(x), int(y)},
-			MaxProd: rnd.Intn(maxp-minp) + minp,
-			Name:    "nameless",
-		}
 	}
 
 	ppp := fmt.Sprintf("%.2f", float64(s.NumPlanets())/float64(np))
@@ -115,22 +99,79 @@ func (s *StarMap) InitMap(np int) error {
 	fmt.Println("Number of planets  =", s.NumPlanets())
 	fmt.Println("Planets per player =", ppp)
 
-	// Employ k-means clustering to find homewords
-	hw := kMeans(nodes, np, gs)
+	for count := 1; count <= 10; count++ {
 
-	s.HomeWorlds = make([]int, np)
-	for i, h := range hw {
-		s.HomeWorlds[i] = CellPos(s.GridSize, h[0], h[1])
+		// Employ k-means clustering to find homewords
+		hw := kMeans(nodes, np, gs)
+
+		s.HomeWorlds = make([]int, np)
+		for i, h := range hw {
+			s.HomeWorlds[i] = CellPos(s.GridSize, h[0], h[1])
+		}
+		// Make sure we have a unique set
+		if countDuplicates(s.HomeWorlds) == 0 {
+			break
+		}
+
+		if count > 9 {
+			return errors.New("Error resolving homeworlds! Try fewer players.")
+		}
+
 	}
-	
-	// Validate homeworlds just in case
-	// Don't expect any rounding errors... :-O
-	if !subset(s.HomeWorlds, s.Systems) {
-		return errors.New("Homeworld validation error!")
-	}	
-	
+
+	s.Systems = append(s.HomeWorlds, s.Systems...)
+	s.Systems = removeDuplicates(s.Systems)
+
+	// Seed the random number generator with system time
+	rnd := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
+
+	s.Planets = make(map[int]*Planet)
+	for _, c := range s.Systems {
+		x, y := GridPos(c, s.GridSize)
+		s.Planets[c] = &Planet{
+			ID:      c,
+			Pos:     XY{x, y},
+			MaxProd: rnd.Intn(maxp-minp) + minp,
+			Name:    "nameless",
+		}
+	}
+
 	return nil
-	
+
+}
+
+// https://www.dotnetperls.com/duplicates-go
+func removeDuplicates(elements []int) []int {
+	// Use map to record duplicates as we find them.
+	encountered := map[int]bool{}
+	result := []int{}
+
+	for v := range elements {
+		if encountered[elements[v]] == true {
+			// Do not add duplicate.
+		} else {
+			// Record this element as an encountered element.
+			encountered[elements[v]] = true
+			// Append to result slice.
+			result = append(result, elements[v])
+		}
+	}
+	// Return the new slice.
+	return result
+}
+
+func countDuplicates(dupArr []int) int {
+	dupsize := len(dupArr)
+	dupcount := 0
+	for i := 0; i < dupsize; i++ {
+		for j := i + 1; j < dupsize; j++ {
+			if dupArr[i] == dupArr[j] {
+				dupcount++
+				break
+			}
+		}
+	}
+	return dupcount
 }
 
 // subset returns true if the first array is completely

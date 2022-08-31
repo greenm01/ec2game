@@ -9,7 +9,7 @@ type Planet struct {
 	ID      int      // Internal ID
 	Pos     XY       // Starmap position
 	Name    string   // Planet's name
-	Empire  int   // Current owner
+	Empire  int      // Current owner
 	MaxProd int      // Max production
 	CurProd int      // Current production
 	BTC     int      // Bitcoin stored

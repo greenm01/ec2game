@@ -1,18 +1,17 @@
 package io
 
 import (
-    bx "github.com/treilik/bubbleboxer"
 	tea "github.com/charmbracelet/bubbletea"
+	bx "github.com/treilik/bubbleboxer"
 )
 
 type planetCmd struct {
-    tui bx.Boxer
-    text string
+	tui  bx.Boxer
+	text string
 }
 
-
 func (m planetCmd) GetTui() bx.Boxer { return m.tui }
-func (m planetCmd) InitBox() {}
+func (m planetCmd) InitBox()         {}
 
 // satisfy the tea.Model interface
 func (b planetCmd) Init() tea.Cmd                           { return nil }

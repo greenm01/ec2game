@@ -6,24 +6,23 @@ import (
 	"sync"
 )
 
-
 type GameSpace struct {
-	sessions map[int]*Session
-	lastSid int
-	entrance chan net.Conn
-	incoming chan string
-	outgoing chan string
+	sessions  map[int]*Session
+	lastSid   int
+	entrance  chan net.Conn
+	incoming  chan string
+	outgoing  chan string
 	roomMutex sync.Mutex
 }
 
 func NewGameSpace() *GameSpace {
 	gs := &GameSpace{
 		sessions: make(map[int]*Session),
-		lastSid: -1,
+		lastSid:  -1,
 		entrance: make(chan net.Conn),
 		incoming: make(chan string),
 		outgoing: make(chan string),
-//		roomMutex:
+		//		roomMutex:
 	}
 	fmt.Println("A new GameSpace created.")
 	return gs
@@ -45,16 +44,16 @@ func (gs *GameSpace) Join(connection net.Conn) {
 	defer gs.roomMutex.Unlock()
 	newSessionId := gs.lastSid + 1
 	gs.lastSid = newSessionId
-	
+
 	session := NewSession(newSessionId, gs, connection)
 	session.Listen()
 	fmt.Println("session started listening.")
-	
+
 	_, keyExist := gs.sessions[newSessionId]
-	if ! keyExist {
+	if !keyExist {
 		gs.sessions[newSessionId] = session
 	}
-	
+
 	go func() { // goroutine for roomConn writer
 		for {
 			select {
@@ -69,7 +68,7 @@ func (gs *GameSpace) Join(connection net.Conn) {
 
 // This goroutine runs forever, and does not need a channel to kill it.
 func (gs *GameSpace) Listen() {
-	go func() {  
+	go func() {
 		for {
 			select {
 			case data := <-gs.incoming:
