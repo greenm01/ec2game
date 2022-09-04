@@ -3,14 +3,15 @@ module github.com/greenm01/ec2game
 go 1.18
 
 require (
+	github.com/akrylysov/pogreb v0.10.1
 	github.com/charmbracelet/bubbletea v0.22.0
 	github.com/charmbracelet/lipgloss v0.5.0
 	github.com/fogleman/poissondisc v0.0.0-20190923201222-9b82984c50c5
 	github.com/magefile/mage v1.13.0
 	github.com/mash/gokmeans v0.0.0-20170215130432-ea22cff45f59
 	github.com/npillmayer/nestext v0.1.3
+	github.com/speps/go-hashids/v2 v2.0.1
 	github.com/treilik/bubbleboxer v0.1.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

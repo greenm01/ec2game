@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/gob"
 	"errors"
 	"io/ioutil"
 	"reflect"
@@ -11,38 +13,67 @@ import (
 	ntx "github.com/npillmayer/nestext"
 )
 
-type configData struct {
-	Players     int
-	Host        string
-	Sysop       string
-	LaunchDate  time.Time
+type config struct {
+	players int
+	host    string
+	sysop   string
+
+	launchDate   time.Time
+	maintTime    time.Time
+	lastMaintRun time.Time
+
 	MaintPeriod int
-	MaintTime   time.Time
 	IP          string
 	Port        int
 }
 
-func loadConfig(path string) (configData, error) {
+func (c config) NumPlayers() int {
+	return c.players
+}
 
-	config := configData{}
+func (c config) LaunchDate() string {
+	return c.launchDate.Format("2006-01-02")
+}
 
-	nasty := errors.New("\nGame config.ns file not in the proper format! " +
+func (c config) MaintTime() string {
+	return c.maintTime.Format("15:04")
+}
+
+func (c config) Encode() (bytes.Buffer, error) {
+
+	var buff bytes.Buffer
+	enc := gob.NewEncoder(&buff)
+	if err := enc.Encode(c); err != nil {
+		return buff, err
+	}
+
+	return buff, nil
+
+}
+
+func (c config) LastMaintRun() string {
+	return c.lastMaintRun.Format("15:04")
+}
+
+func (cfg *config) Setup(path string) error {
+
+	nasty := errors.New("\nYour " + configFile + " file is not in the proper format! " +
 		"Please read game docs for an example.\n")
 
 	filePath := path + configFile
 	f, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return config, nasty
+		return errors.New("Error reading config.ns file! Recheck your path.")
 	}
 
 	nestedText, err := ntx.Parse(strings.NewReader(string(f)))
 	if err != nil {
-		return config, nasty
+		return nasty
 	}
 
 	nt := reflect.ValueOf(nestedText)
 	if nt.Kind() != reflect.Map {
-		return config, nasty
+		return nasty
 	}
 
 	/* https://riptutorial.com/go/example/29810/time-parsing */
@@ -55,48 +86,48 @@ func loadConfig(path string) (configData, error) {
 			s := strings.TrimSpace(v.Interface().(string))
 			m, err := strconv.Atoi(s)
 			if err != nil {
-				return config, errors.New(nasty2 + "players")
+				return errors.New(nasty2 + "players")
 			}
-			config.Players = m
+			cfg.players = m
 		case "host":
-			config.Host = strings.TrimSpace(v.Interface().(string))
+			cfg.host = strings.TrimSpace(v.Interface().(string))
 		case "sysop":
-			config.Sysop = strings.TrimSpace(v.Interface().(string))
+			cfg.sysop = strings.TrimSpace(v.Interface().(string))
 		case "launchDate":
 			date := strings.TrimSpace(v.Interface().(string))
 			t, err := time.Parse("2006-01-02", date)
 			if err != nil {
-				return config, errors.New(nasty2 + "launchDate")
+				return errors.New(nasty2 + "launchDate")
 			}
-			config.LaunchDate = t
+			cfg.launchDate = t
 		case "ip":
-			config.IP = strings.TrimSpace(v.Interface().(string))
+			cfg.IP = strings.TrimSpace(v.Interface().(string))
 		case "port":
 			s := strings.TrimSpace(v.Interface().(string))
 			m, err := strconv.Atoi(s)
 			if err != nil {
-				return config, errors.New(nasty2 + "port")
+				return errors.New(nasty2 + "port")
 			}
-			config.Port = m
+			cfg.Port = m
 		case "maintTime":
 			ts := strings.TrimSpace(v.Interface().(string))
 			t, err := time.Parse("15:04", ts)
 			if err != nil {
-				return config, errors.New(nasty2 + "maintTime")
+				return errors.New(nasty2 + "maintTime")
 			}
-			config.MaintTime = t
+			cfg.maintTime = t
 		case "maintPeriod":
 			s := strings.TrimSpace(v.Interface().(string))
 			m, err := strconv.Atoi(s)
 			if err != nil {
-				return config, errors.New(nasty2 + "maintPeriod")
+				return errors.New(nasty2 + "maintPeriod")
 			}
-			config.MaintPeriod = m
+			cfg.MaintPeriod = m
 		default:
-			return config, nasty
+			return nasty
 		}
 	}
 
-	return config, nil
+	return nil
 
 }

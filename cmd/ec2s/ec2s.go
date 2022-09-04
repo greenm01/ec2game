@@ -1,55 +1,38 @@
 package main
 
-/* TODO: 1) Consider switching config file to
-            NestedText format
-		 2) Setup game data, save to database
-         3) Enable new players to join before game launch
-
-  NOTES:
-
-		 1) For the BBS client, consider sticking with the
-            classic EC game menu formating, ANSI compliant.
-	        This will anable playtesting of the core game
-		    without spending too much time developing a nice
-            "modern" UI
-         2) Once the core game is stable, donsider a new command
-            dashboard client for a terminal based game (not BBS)
-            that is UTF-8 compliant.
-*/
+/* TODO: 1) Enable new players to join before game launch */
 
 import (
 	"errors"
 	"fmt"
-	"net"
 	"os"
 	"strings"
-	"time"
-
-	"github.com/greenm01/ec2game/internal/server"
 )
 
 const (
 	configFile = "config.nt"
+	startYear  = 3000
 	exitFail   = 1
 	usage      = "\nEsterian Conquest v2.0 GAME SERVER\n\n" +
 		"Usage: ec2s <command> [game path]\n\n" +
 		"The commands are:\n\n" +
-		"                      new            Initialize a new game\n" +
-		"                      run            Start the game server\n" +
-		"                      maint          Manually run turn maintenance [TODO]\n" +
-		"                      stats          Display game stastics [TODO]\n\n" +
-		"- Be sure to specify the game folder directory, e.g. ec2s new /User/mag/ec2/game1\n\n" +
-		"- Ensure you drop an updated config.yaml for each new game in this folder\n" +
-		"  > Example config.yaml, with required fields:\n" +
+		"                      new          # Initialize a new game\n" +
+		"                      run          # Start the game server\n" +
+		"                      maint        # Manually run turn maintenance [TODO]\n" +
+		"                      stats        # Display game stastics [TODO]\n\n" +
+		"- Be sure to specify the game folder directory, e.g. ec2s new /User/mag/ec2/game1/\n\n" +
+		"- Ensure you drop an updated config.nt (nestedtext.org format) for each new game in this folder\n" +
+		"  > Example config.nt, with required fields:\n" +
 		"  > \n" +
-		"  > players: 4                       # Number of players in game\n" +
-		"  > host: Toys In The Attic BBS      # Host system name\n" +
-		"  > sysop: Mason Austin Green        # System operator name\n" +
-		"  > startDate: 2022-08-23            # Day to officialy start the game: YEAR-MM-DD\n" +
-		"  > maintPeriod: 24                  # Time between maintenance runs (hours) \n" +
-		"  > ip: localhost                    # Your server's IP address\n" +
-		"  > port: 7777                       # Port number\n\n" +
-		"- To delete a game, delete the folder (save the config.yaml file for later use)\n"
+		"  > players: 4                     # Number of players in game\n" +
+		"  > host: Toys In The Attic BBS    # Host system name\n" +
+		"  > sysop: Mason Austin Green      # System operator name\n" +
+		"  > launchDate: 2022-08-23         # Day to officialy start the game: YEAR-MM-DD\n" +
+		"  > maintPeriod: 24                # Time between maintenance runs (hours) \n" +
+		"  > maintTime: 00:01               # Daily maintenance time (hh:mm) 24hr format\n" +
+		"  > ip: localhost                  # Your server's IP address\n" +
+		"  > port: 1992                     # Port number\n\n" +
+		"- To delete a game, delete the folder (save the config.nt file for later use)\n"
 )
 
 func main() {
@@ -80,45 +63,25 @@ func run(args []string) error {
 
 func newGame(path string) error {
 
-	config, err := loadConfig(path)
-	if err != nil {
+	if _, err := os.Stat(path + "db"); !os.IsNotExist(err) {
+		// path/to/whatever/ exists
+		return errors.New("Error: game database already exists in this location.")
+	}
+
+	if err := newGameSetup(path); err != nil {
 		return err
 	}
 
-	return newGameSetup(config)
+	return nil
+
 }
 
 func runGame(path string) error {
+
+	// Load game config and gamestate
+	// Init server
+	// If year = 3,000 AND user not in game, then show first-time-menu
+	// If year = 3,000 and user is game, show regular menu
+
 	return initServer()
-}
-
-func initServer() error {
-
-	fmt.Println("Server started.")
-
-	port := "6666"
-	listener, err_listen := net.Listen("tcp", ":"+port)
-	if err_listen != nil {
-		return errors.New("Game server listener failed. Exit")
-	}
-
-	fmt.Println("Server started to listen on port " + port)
-
-	gameSpace := server.NewGameSpace()
-	// listen
-	gameSpace.Listen()
-
-	for {
-		conn, err_ac := listener.Accept()
-		if err_ac != nil {
-			fmt.Println("Connection accepting failed.")
-			conn.Close()
-			time.Sleep(100 * time.Millisecond)
-			continue
-		}
-		fmt.Println("A new connection accepted.")
-		gameSpace.Connect(conn)
-	}
-
-	return nil
 }

@@ -39,19 +39,17 @@ func CellPos(grid int, x int, y int) int {
 // distribution of homeworlds.
 func kMeans(sys []km.Node, np int, gs float64) [][]int {
 
-	fmt.Print("...\nFinding homeworlds...")
+	fmt.Print("Finding homeworlds...")
 
 	// Get a list of centroid clusters
 	_, centroids := km.Train(sys, np, 50)
 
 	hw := make([][]int, np)
 	for i, cent := range centroids {
-		//n := km.Nearest(cent, sys)
-		//hw[i] = []int{int(sys[n][0]), int(sys[n][1])}
 		hw[i] = []int{int(cent[0]), int(cent[1])}
 	}
 
-	fmt.Println("done!")
+	fmt.Println("done!\n...")
 
 	return hw
 
@@ -64,6 +62,8 @@ func (s StarMap) NumPlanets() int {
 // Init: Setup the game's starmap and planets
 func (s *StarMap) InitMap(np int) error {
 
+	fmt.Print("...\nGenerating starmap...")
+
 	// Classic EC starmap size bound by number of players:
 	// [4:18x18, 9:27x27, 16:36x36, 25:45x45]
 	// Nonlinar power regression gives us a nice distribution
@@ -75,8 +75,9 @@ func (s *StarMap) InitMap(np int) error {
 	// Generate starmap based on a random Poisson distribution
 	// This generates a much nicer distribution over a pure random set
 	// http://devmag.org.za/2009/05/03/poisson-disk-sampling/
-	// Minimum distance between systems is PI, which lends to approx
-	// 5-6 planets per player.
+	// Minimum distance between systems is PI. Why not?
+
+	/* TODO: Consider adding perlin noise to distribution */
 
 	gs := float64(s.GridSize)
 	points := pd.Sample(0, 0, gs, gs, math.Pi, 50, nil)
@@ -84,20 +85,12 @@ func (s *StarMap) InitMap(np int) error {
 	s.Systems = make([]int, len(nodes))
 
 	for i, p := range points {
-		x := math.Floor(p.X)
-		y := math.Floor(p.Y)
-		nodes[i] = []float64{x, y}
-		c := CellPos(s.GridSize, int(x), int(y))
+		nodes[i] = []float64{p.X, p.Y}
+		c := CellPos(s.GridSize, int(p.X), int(p.Y))
 		s.Systems[i] = c
 	}
 
-	ppp := fmt.Sprintf("%.2f", float64(s.NumPlanets())/float64(np))
-
-	fmt.Println("...\nGenerating starmap:")
-	fmt.Println("Grid size          =", gs, "x", gs)
-	fmt.Println("Number of players  =", np)
-	fmt.Println("Number of planets  =", s.NumPlanets())
-	fmt.Println("Planets per player =", ppp)
+	fmt.Println("done!")
 
 	for count := 1; count <= 10; count++ {
 
@@ -121,6 +114,14 @@ func (s *StarMap) InitMap(np int) error {
 
 	s.Systems = append(s.HomeWorlds, s.Systems...)
 	s.Systems = removeDuplicates(s.Systems)
+
+	ppp := fmt.Sprintf("%.2f", float64(s.NumPlanets())/float64(np))
+	fmt.Println("Grid size          =", gs, "x", gs)
+	fmt.Println("Number of players  =", np)
+	fmt.Println("Number of planets  =", s.NumPlanets())
+	fmt.Println("Planets per player =", ppp)
+	//fmt.Println("Systems =",s.Systems)
+	//fmt.Println("Homeworlds =", s.HomeWorlds)
 
 	// Seed the random number generator with system time
 	rnd := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
