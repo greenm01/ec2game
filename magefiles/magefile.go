@@ -34,6 +34,24 @@ func Run() error {
 	return nil
 }
 
+// Builds the BBS Door client app
+func (Build) BBS() error {
+	
+	if err := sh.Run("go", "mod", "download"); err != nil {
+		return err
+	}
+	
+	fmt.Print("Building game client...")
+	
+	if err := sh.Run("go", "build", "-ldflags", "-s -w", "./cmd/bbs"); err != nil {
+		return err
+	}
+	
+	fmt.Println("success!")
+	return nil
+	
+}
+
 // Builds the client app
 func (Build) Game() error {
 	

@@ -4,28 +4,39 @@ import (
 	"fmt"
 	"net"
 	"sync"
+	
+	"github.com/greenm01/ec2game/internal/core"
+	
 )
 
 type GameSpace struct {
+	
+	// Network handlers
 	sessions  map[int]*Session
 	lastSid   int
 	entrance  chan net.Conn
 	incoming  chan string
 	outgoing  chan string
 	roomMutex sync.Mutex
+	
+	// Game related
+	cfg core.Config
+	gState core.GameState
+	
 }
 
-func NewGameSpace() *GameSpace {
-	gs := &GameSpace{
+func NewGameSpace(cg core.Config, gs core.GameState) *GameSpace {
+	space := &GameSpace{
 		sessions: make(map[int]*Session),
 		lastSid:  -1,
 		entrance: make(chan net.Conn),
 		incoming: make(chan string),
 		outgoing: make(chan string),
-		//		roomMutex:
+		cfg: cg,
+		gState: gs,
 	}
 	fmt.Println("A new GameSpace created.")
-	return gs
+	return space
 }
 
 func (gs *GameSpace) Connect(conn net.Conn) {

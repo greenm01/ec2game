@@ -9,15 +9,15 @@ import (
 )
 
 type Ship = core.Ship
-
+	
 func newGameSetup(path string) error {
 
-	cfg := config{}
-	if err := cfg.Setup(path); err != nil {
+	cfg := core.Config{GameYear: STARTYEAR}
+	if err := cfg.Load(path); err != nil {
 		return err
 	}
 
-	gs := &core.GameState{Year: startYear}
+	gs := &core.GameState{Year: STARTYEAR}
 
 	fmt.Println("\n################################")
 	fmt.Println("##### Creating New EC Game #####")
@@ -25,7 +25,7 @@ func newGameSetup(path string) error {
 
 	// Number of players
 
-	np := cfg.NumPlayers()
+	np := cfg.NumPlayers
 	if np < 2 {
 		e := "\nError! Minimum number of players is 2.\n" +
 			"Fix the configuration file.\n"
@@ -103,7 +103,7 @@ func newGameSetup(path string) error {
 		return err
 	}
 
-	if err := db.Write(db.GenKey(dex, startYear), buff, path); err != nil {
+	if err := db.Write(db.GenKey(dex, STARTYEAR), buff, path); err != nil {
 		return err
 	}
 
@@ -113,13 +113,13 @@ func newGameSetup(path string) error {
 	if err != nil {
 		return err
 	}
-	if err := db.Write(db.GenKey(dex, startYear), buff, path); err != nil {
+	if err := db.Write(db.GenKey(dex, STARTYEAR), buff, path); err != nil {
 		return err
 	}
 
 	fmt.Println("done!")
 
-	fmt.Println("Launch date & time set to", cfg.LaunchDate(), "@", cfg.MaintTime())
+	fmt.Println("Launch date & time set to", cfg.LDate(), "@", cfg.MTime())
 
 	return nil
 

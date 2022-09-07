@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"bytes"
@@ -10,36 +10,47 @@ import (
 	"strings"
 	"time"
 
+	"github.com/greenm01/ec2game/internal/global"
+	
 	ntx "github.com/npillmayer/nestext"
 )
 
-type config struct {
-	players int
-	host    string
-	sysop   string
+const CONFIGFILE = global.CONFIGFILE
 
-	launchDate   time.Time
-	maintTime    time.Time
-	lastMaintRun time.Time
+type Config struct {
+
+	GameYear int
+	
+	NumPlayers int
+	Host    string
+	Sysop   string
+
+	LaunchDate   time.Time
+	MaintTime    time.Time
+	LastMaintRun time.Time
 
 	MaintPeriod int
 	IP          string
-	Port        int
+	Port        string
+	
 }
 
-func (c config) NumPlayers() int {
-	return c.players
+// LDate return the game launch date as text
+func (c *Config) LDate() string {
+	return c.LaunchDate.Format("2006-01-02")
 }
 
-func (c config) LaunchDate() string {
-	return c.launchDate.Format("2006-01-02")
+// MTime return the maintenance time as text
+func (c *Config) MTime() string {
+	return c.MaintTime.Format("15:04")
 }
 
-func (c config) MaintTime() string {
-	return c.maintTime.Format("15:04")
+// LMRun returns last maintenance run time as text
+func (c *Config) LMRun() string {
+	return c.LastMaintRun.Format("15:04")
 }
 
-func (c config) Encode() (bytes.Buffer, error) {
+func (c *Config) Encode() (bytes.Buffer, error) {
 
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
@@ -51,19 +62,15 @@ func (c config) Encode() (bytes.Buffer, error) {
 
 }
 
-func (c config) LastMaintRun() string {
-	return c.lastMaintRun.Format("15:04")
-}
+func (cfg *Config) Load(path string) error {
 
-func (cfg *config) Setup(path string) error {
-
-	nasty := errors.New("\nYour " + configFile + " file is not in the proper format! " +
+	nasty := errors.New("\nYour " + CONFIGFILE + " file is not in the proper format! " +
 		"Please read game docs for an example.\n")
 
-	filePath := path + configFile
+	filePath := path + CONFIGFILE
 	f, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return errors.New("Error reading config.ns file! Recheck your path.")
+		return errors.New("Error reading " + CONFIGFILE + " file! Recheck your path.")
 	}
 
 	nestedText, err := ntx.Parse(strings.NewReader(string(f)))
@@ -80,7 +87,7 @@ func (cfg *config) Setup(path string) error {
 
 	for _, key := range nt.MapKeys() {
 		v := nt.MapIndex(key)
-		nasty2 := "Error parsing config.ns file: "
+		nasty2 := "Error parsing " + CONFIGFILE + " file: "
 		switch key.Interface().(string) {
 		case "players":
 			s := strings.TrimSpace(v.Interface().(string))
@@ -88,34 +95,29 @@ func (cfg *config) Setup(path string) error {
 			if err != nil {
 				return errors.New(nasty2 + "players")
 			}
-			cfg.players = m
+			cfg.NumPlayers = m
 		case "host":
-			cfg.host = strings.TrimSpace(v.Interface().(string))
+			cfg.Host = strings.TrimSpace(v.Interface().(string))
 		case "sysop":
-			cfg.sysop = strings.TrimSpace(v.Interface().(string))
+			cfg.Sysop = strings.TrimSpace(v.Interface().(string))
 		case "launchDate":
 			date := strings.TrimSpace(v.Interface().(string))
 			t, err := time.Parse("2006-01-02", date)
 			if err != nil {
 				return errors.New(nasty2 + "launchDate")
 			}
-			cfg.launchDate = t
+			cfg.LaunchDate = t
 		case "ip":
 			cfg.IP = strings.TrimSpace(v.Interface().(string))
 		case "port":
-			s := strings.TrimSpace(v.Interface().(string))
-			m, err := strconv.Atoi(s)
-			if err != nil {
-				return errors.New(nasty2 + "port")
-			}
-			cfg.Port = m
+			cfg.Port = strings.TrimSpace(v.Interface().(string))
 		case "maintTime":
 			ts := strings.TrimSpace(v.Interface().(string))
 			t, err := time.Parse("15:04", ts)
 			if err != nil {
 				return errors.New(nasty2 + "maintTime")
 			}
-			cfg.maintTime = t
+			cfg.MaintTime = t
 		case "maintPeriod":
 			s := strings.TrimSpace(v.Interface().(string))
 			m, err := strconv.Atoi(s)
@@ -124,7 +126,7 @@ func (cfg *config) Setup(path string) error {
 			}
 			cfg.MaintPeriod = m
 		default:
-			return nasty
+			return errors.New(nasty2 + "unknown value")
 		}
 	}
 

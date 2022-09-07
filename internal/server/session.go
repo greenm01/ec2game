@@ -7,9 +7,14 @@ import (
 	"net"
 	"sync"
 	"time"
+	
+	"github.com/greenm01/ec2game/internal/core"
+	
 )
 
 type Session struct {
+	
+	// Network stuff
 	sid                       int
 	gameSpace                 *GameSpace
 	connection                net.Conn
@@ -21,6 +26,10 @@ type Session struct {
 	killSocketReaderGoroutine chan bool
 	killSocketWriterGoroutine chan bool
 	sessionMutex              sync.Mutex
+	
+	// Game stuff
+	Player core.PlayerState
+	
 }
 
 func NewSession(sid int, gameSpace *GameSpace, connection net.Conn) *Session {

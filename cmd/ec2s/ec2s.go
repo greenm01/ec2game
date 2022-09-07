@@ -7,11 +7,15 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	
+	"github.com/greenm01/ec2game/internal/global"
+	
 )
 
+const STARTYEAR = global.STARTYEAR 
+const DBDIR = global.DBDIR
+
 const (
-	configFile = "config.nt"
-	startYear  = 3000
 	exitFail   = 1
 	usage      = "\nEsterian Conquest v2.0 GAME SERVER\n\n" +
 		"Usage: ec2s <command> [game path]\n\n" +
@@ -63,7 +67,7 @@ func run(args []string) error {
 
 func newGame(path string) error {
 
-	if _, err := os.Stat(path + "db"); !os.IsNotExist(err) {
+	if _, err := os.Stat(path + DBDIR); !os.IsNotExist(err) {
 		// path/to/whatever/ exists
 		return errors.New("Error: game database already exists in this location.")
 	}
@@ -83,5 +87,10 @@ func runGame(path string) error {
 	// If year = 3,000 AND user not in game, then show first-time-menu
 	// If year = 3,000 and user is game, show regular menu
 
-	return initServer()
+	if _, err := os.Stat(path + DBDIR); os.IsNotExist(err) {
+		// path/to/whatever/ exists
+		return errors.New("Error: game does not exist in specified path.")
+	}
+	
+	return initServer(path)
 }
