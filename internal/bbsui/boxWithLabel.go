@@ -1,17 +1,17 @@
-package ui
+package bbsui
 
 import (
 	"strings"
 	lg "github.com/charmbracelet/lipgloss"
 )
 
-type BoxWithLabel struct {
+type boxWithLabel struct {
 	BoxStyle   lg.Style
 	LabelStyle lg.Style
 }
 
-func NewBoxWithLabel() BoxWithLabel {
-	return BoxWithLabel{
+func newBoxWithLabel() boxWithLabel {
+	return boxWithLabel{
 		BoxStyle: lg.NewStyle().
 			Border(lg.RoundedBorder()).
 			BorderForeground(lg.Color("63")).
@@ -27,7 +27,7 @@ func NewBoxWithLabel() BoxWithLabel {
 	}
 }
 
-func (b BoxWithLabel) Render(label, content string, width int) string {
+func (b boxWithLabel) Render(label, content string, width int) string {
 	var (
 		// Query the box style for some of its border properties so we can
 		// essentially take the top border apart and put it around the label.

@@ -9,6 +9,7 @@ github.com/akrylysov/pogreb/internal/hash
 github.com/atotto/clipboard
 # github.com/charmbracelet/bubbles v0.14.0
 ## explicit; go 1.13
+github.com/charmbracelet/bubbles/spinner
 github.com/charmbracelet/bubbles/textinput
 # github.com/charmbracelet/bubbletea v0.22.1
 ## explicit; go 1.13

@@ -1,17 +1,16 @@
 package main
 
 import (
-	"fmt"
-	"github.com/charmbracelet/bubbles/textinput"	
+	ui "github.com/greenm01/ec2game/internal/bbsui"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func run() error {
-	
+	/* TODO: load playerstate from server
 	path, err := getPath()
 	if err != nil {
 		return err
-	}	
+	}*/	
 
 	p := tea.NewProgram(initialCmd())
 
@@ -19,23 +18,12 @@ func run() error {
 		return err
 	}
 	
-	fmt.Println(path)
-	
 	return nil
 }
 
-func initialCmd() FirstTimeCommand {
-	ti := textinput.New()
-	ti.Placeholder = "Esterian Conquest"
-	ti.Focus()
-	ti.CharLimit = 156
-	ti.Width = 20
-
-	ftm := FirstTimeCommand{textInput: ti,
-		                          err: nil,}
-	
-	ftm.BuildMenu()
-	
-	return ftm
+func initialCmd() ui.FirstTime {
+	ft := ui.FirstTime{}
+	ft.Build()
+	return ft
 }
 
