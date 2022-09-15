@@ -70,8 +70,6 @@ func (p *Pager) Build(s string) {
 
 }
 
-func (p Pager) Init() tea.Cmd { return nil }
-
 func (m *Pager) Update(msg tea.Msg) tea.Cmd {
 	
 	var (

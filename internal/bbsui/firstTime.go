@@ -96,10 +96,6 @@ func (ft *FirstTime) Build() {
 	//tea.Sequence(ft.spin.Tick)
 }
 
-func (ft FirstTime) Init() tea.Cmd {
-	return ft.spin.Tick
-}
-
 func (ft *FirstTime) Update(msg tea.Msg) tea.Cmd {
 	
 	switch msg := msg.(type) {

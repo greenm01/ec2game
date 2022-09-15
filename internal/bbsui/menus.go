@@ -36,7 +36,6 @@ func changeMenu(adr string) tea.Cmd {
 }
 
 type Model interface {
-	Init() tea.Cmd
 	Update(tea.Msg) (tea.Cmd)
 	View() string
 }
@@ -63,8 +62,7 @@ func (m *Menu) Build(address string, model Model) {
 }
 
 func (m Menu) Init() tea.Cmd {
-	address.Set("ftm")
-	return m.MenuMap["ftm"].Init()
+	return changeMenu("ftm")
 }
 
 func (m Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
