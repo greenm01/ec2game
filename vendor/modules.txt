@@ -4,13 +4,11 @@ github.com/akrylysov/pogreb
 github.com/akrylysov/pogreb/fs
 github.com/akrylysov/pogreb/internal/errors
 github.com/akrylysov/pogreb/internal/hash
-# github.com/atotto/clipboard v0.1.4
-## explicit
-github.com/atotto/clipboard
 # github.com/charmbracelet/bubbles v0.14.0
 ## explicit; go 1.13
+github.com/charmbracelet/bubbles/key
 github.com/charmbracelet/bubbles/spinner
-github.com/charmbracelet/bubbles/textinput
+github.com/charmbracelet/bubbles/viewport
 # github.com/charmbracelet/bubbletea v0.22.1
 ## explicit; go 1.13
 github.com/charmbracelet/bubbletea

@@ -11,19 +11,23 @@ func run() error {
 	if err != nil {
 		return err
 	}*/	
-
+	ui.Cls()
 	p := tea.NewProgram(initialCmd())
-
 	if err := p.Start(); err != nil {
 		return err
 	}
-	
+	ui.Cls()
 	return nil
 }
 
-func initialCmd() ui.FirstTime {
-	ft := ui.FirstTime{}
-	ft.Build()
-	return ft
+func initialCmd() ui.Menu {
+	var menu ui.Menu
+	ftm := ui.FirstTime{}
+	ftm.Build()
+	menu.Build("ftm", &ftm)
+	pager := ui.Pager{}
+	pager.Build(ui.Intro())
+	menu.Build("intro", &pager)
+	return menu
 }
 
