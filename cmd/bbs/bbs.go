@@ -1,12 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"net"
 	"os"
-	"strings"
-	"time"
 	"flag"
 	"errors"
 )
@@ -15,11 +11,22 @@ const (
 	exitFail = 1
 )
 
-func getPath() (string,error) {
+/* TODO: Make version a global constant */
+func usage() string {
+	return 	"Esterian Conquest v2.0\n\n" +
+		 	"Invalid command line flags!\n\n" +
+		   	"The required flags are:\n\n" +
+	       	"          -drop      Path to door32.sys dropfile\n" +
+	       	"          -game      Path to game diretory\n\n" +
+	       	"Example: -drop ./bbsDropFilePath -game ./game1Path\n" 
+}
+
+func getPaths(dp string, gp string) (string,string,error) {
        
 	// Use FLAG to get command line paramenters
-	pathPtr := flag.String("path", "", "path to door32.sys file")
-	required := []string{"path"}
+	pathPtr := flag.String(dp, "", "path to door32.sys dropfile") 
+	gamePth := flag.String(gp, "", "path to game files")
+	required := []string{dp,gp}
 
 	flag.Parse()
 
@@ -27,45 +34,11 @@ func getPath() (string,error) {
 	flag.Visit(func(f *flag.Flag) { seen[f.Name] = true })
 	for _, req := range required {
 		if !seen[req] {
-			// or possibly use `log.Fatalf` instead of:
-			return *pathPtr, errors.New("missing path to door32.sys directory")
+			return *pathPtr, *gamePth, errors.New(usage())
 		}
 	}
-	return *pathPtr, nil
-        
-}
-
-func startClient() error {
-
-    PORT := ":1992" 
-    l, err := net.Listen("tcp", PORT)
-    if err != nil {
-            return err
-    }
-    defer l.Close()
-
-    c, err := l.Accept()
-    if err != nil {
-            return err
-    }
-
-    for {
-            netData, err := bufio.NewReader(c).ReadString('\n')
-            if err != nil {
-                    return err
-            }
-            if strings.TrimSpace(string(netData)) == "STOP" {
-                    return err
-            }
-
-            fmt.Print("-> ", string(netData))
-            t := time.Now()
-            myTime := t.Format(time.RFC3339) + "\n"
-            c.Write([]byte(myTime))
-    }
-	
-	return nil
-               
+	return *pathPtr, *gamePth, nil
+	        
 }
 
 func main() {

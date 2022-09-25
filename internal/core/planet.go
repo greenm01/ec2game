@@ -30,14 +30,31 @@ type PlanetDB struct {
 	// Map keys = Planet.ID
 	Name        map[int]string
 	YearScouted map[int]int
+	YearViewed  map[int]int
 	MaxProd     map[int]int
 	CurProd     map[int]int
 	BTC         map[int]int
-	Owner       map[int]int
-	PrevOwner   map[int]int
+	Owner       map[int]string
+	PrevOwner   map[int]string
 	OwnedFor    map[int]int
 	Dock        map[int][]int
 	AR          map[int]int
 	GB          map[int]int
 	Pos         map[int]XY
+}
+
+func (p *PlanetDB) Init() {
+	p.Name = make(map[int]string)
+	p.Owner = make(map[int]string)
+	p.PrevOwner = make(map[int]string)
+	p.YearScouted = make(map[int]int)
+	p.YearViewed = make(map[int]int)
+	p.MaxProd = make(map[int]int)
+	p.CurProd = make(map[int]int)
+	p.BTC = make(map[int]int)
+	p.OwnedFor = make(map[int]int)
+	p.AR = make(map[int]int)
+	p.GB = make(map[int]int)
+	p.Pos = make(map[int]XY)
+	p.Dock = make(map[int][]int)
 }

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net"
 	"sync"
-	
+	"strings"
 	"github.com/greenm01/ec2game/internal/core"
-	
+	"github.com/greenm01/ec2game/internal/util"
 )
 
 type GameSpace struct {
@@ -21,7 +21,7 @@ type GameSpace struct {
 	
 	// Game related
 	cfg core.Config
-	gState core.GameState
+	state core.GameState
 	
 }
 
@@ -33,7 +33,7 @@ func NewGameSpace(cg core.Config, gs core.GameState) *GameSpace {
 		incoming: make(chan string),
 		outgoing: make(chan string),
 		cfg: cg,
-		gState: gs,
+		state: gs,
 	}
 	fmt.Println("A new GameSpace created.")
 	return space
@@ -65,13 +65,43 @@ func (gs *GameSpace) Join(connection net.Conn) {
 		gs.sessions[newSessionId] = session
 	}
 
-	go func() { // goroutine for roomConn writer
+	go func() { 
 		for {
 			select {
 			case <-session.killRoomConnGoroutine:
 				return
 			case data := <-session.incoming:
-				gs.incoming <- data
+				
+				//gs.incoming <- data
+				/* TODO: Lookup user, load playerstate, broadcast to client  */	
+				s := util.Substr(data,0,5)
+				
+				if s == "USER:" {
+					// user login
+					name := strings.TrimSpace(util.Substr(data,6,len(data)))
+					
+					var ps core.PlayerState
+					var user *core.User
+					var found bool
+			
+					if user, found = gs.state.Users[name]; !found {
+						// User not in game
+						user = &core.User{ID:-1, Name:name, FirstTime:true}
+					}
+					 
+					ps = core.PlayerState{User:user}					
+					ps.Setup(gs.state)
+					d,_ := ps.Encode()
+					session.outgoing <- d.String()
+
+					fmt.Println("Hello,",name)
+				
+				} else if s == "JOIN:" {
+					// new user join game
+					
+				} else {
+					// process commands
+				}				
 			}
 		}
 	}()
@@ -83,7 +113,6 @@ func (gs *GameSpace) Listen() {
 		for {
 			select {
 			case data := <-gs.incoming:
-				//fmt.Println("RECEIVED: " + data)
 				gs.Broadcast(data)
 			case conn := <-gs.entrance:
 				gs.Join(conn)

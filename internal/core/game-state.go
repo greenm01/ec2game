@@ -9,10 +9,13 @@ import (
 // Starmap holds all the planet data
 // Empires holds all the player data
 type GameState struct {
+	Full 	bool
 	Year    int
 	StarMap StarMap
+	// Empire index is user ID
 	Empires map[int]*Empire
-	Users   []User
+	// User index is user's name
+	Users   map[string]*User
 }
 
 func (g GameState) Encode() (bytes.Buffer, error) {

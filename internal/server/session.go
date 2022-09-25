@@ -7,9 +7,6 @@ import (
 	"net"
 	"sync"
 	"time"
-	
-	"github.com/greenm01/ec2game/internal/core"
-	
 )
 
 type Session struct {
@@ -26,10 +23,7 @@ type Session struct {
 	killSocketReaderGoroutine chan bool
 	killSocketWriterGoroutine chan bool
 	sessionMutex              sync.Mutex
-	
-	// Game stuff
-	Player core.PlayerState
-	
+
 }
 
 func NewSession(sid int, gameSpace *GameSpace, connection net.Conn) *Session {
@@ -63,7 +57,7 @@ func (s *Session) Read() {
 			if err != nil {
 				// EOF? yes: disconnected
 				// Judge. if true: LeaveAndDelete -- pop session from gameSpace, and delete session
-				if err == io.EOF {
+				if err == io.EOF { 
 					fmt.Println("Client disconnected. Destroy session, sid=", s.sid)
 					s.LeaveAndDelete()
 				}

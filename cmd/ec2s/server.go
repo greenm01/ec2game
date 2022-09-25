@@ -14,12 +14,12 @@ import (
 func initServer(path string) error {
 
 	/* TODO: (not in order)
-	 *		 1) Parse config-file
-		     2) Load config from DB
+	 *		 1) XX Parse config-file
+		     2) XX Load config from DB
 			 3) Update config, write back to DB
-		     4) Load latest gamestate from DB
-	         5) Configure server from config
-	         6) Create GameSpace and pass gamestate
+		     4) XX Load latest gamestate from DB
+	         5) XX Configure server from config
+	         6) XX Create GameSpace and pass gamestate
 			 7) Monitor system time for maintenance
 	         8) Send/receive game data from user session
 	*/

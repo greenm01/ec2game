@@ -1,30 +1,34 @@
 package main
 
 import (
+	"github.com/greenm01/ec2game/internal/core"
 	ui "github.com/greenm01/ec2game/internal/bbsui"
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 func run() error {
-	/* TODO: load playerstate from server
-	path, err := getPath()
-	if err != nil {
-		return err
-	}*/	
-	ui.Cls()
-	p := tea.NewProgram(initialCmd())
-	if err := p.Start(); err != nil {
+	
+	/* TODO: load playerstate from server */
+	
+	dropPath, gamePath, err := getPaths("drop", "game")
+	if err != nil { 
 		return err
 	}
-	ui.Cls()
-	return nil
+	
+	config := core.Config{}
+	config.Load(gamePath)
+	
+	alias,_,_,_ := dropFileData(dropPath)
+	
+	bbs := bbsClient{user:alias,ip:config.IP,port:config.Port}
+	return bbs.Run(ftm()) 
 }
 
-func initialCmd() ui.Menu {
+// ftm initializes the First Time Menu
+func ftm() ui.Menu {
 	var menu ui.Menu
-	ftm := ui.FirstTime{}
-	ftm.Build()
-	menu.Build("ftm", &ftm)
+	f := ui.FirstTime{}
+	f.Build()
+	menu.Build("ftm", &f)
 	pager := ui.Pager{}
 	pager.Build(ui.Intro())
 	menu.Build("intro", &pager)

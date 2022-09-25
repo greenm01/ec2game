@@ -93,7 +93,6 @@ func (ft *FirstTime) Build() {
 	ft.spin.Spinner = spinner.Dot
 	ft.spin.Style = lg.NewStyle().Foreground(lg.Color("205"))
 
-	//tea.Sequence(ft.spin.Tick)
 }
 
 func (ft *FirstTime) Update(msg tea.Msg) tea.Cmd {

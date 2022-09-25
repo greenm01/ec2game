@@ -85,7 +85,7 @@ func runGame(path string) error {
 	// Load game config and gamestate
 	// Init server
 	// If year = 3,000 AND user not in game, then show first-time-menu
-	// If year = 3,000 and user is game, show regular menu
+	// If year = 3,000 and user in game, show regular menu
 
 	if _, err := os.Stat(path + DBDIR); os.IsNotExist(err) {
 		// path/to/whatever/ exists

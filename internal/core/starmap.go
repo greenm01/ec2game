@@ -6,7 +6,8 @@ import (
 	"math"
 	"math/rand"
 	"time"
-
+	
+	"github.com/greenm01/ec2game/internal/util"
 	pd "github.com/fogleman/poissondisc"
 	km "github.com/mash/gokmeans"
 )
@@ -102,7 +103,7 @@ func (s *StarMap) InitMap(np int) error {
 			s.HomeWorlds[i] = CellPos(s.GridSize, h[0], h[1])
 		}
 		// Make sure we have a unique set
-		if countDuplicates(s.HomeWorlds) == 0 {
+		if util.CountDuplicates(s.HomeWorlds) == 0 {
 			break
 		}
 
@@ -113,7 +114,7 @@ func (s *StarMap) InitMap(np int) error {
 	}
 
 	s.Systems = append(s.HomeWorlds, s.Systems...)
-	s.Systems = removeDuplicates(s.Systems)
+	s.Systems = util.RemoveDuplicates(s.Systems)
 
 	ppp := fmt.Sprintf("%.2f", float64(s.NumPlanets())/float64(np))
 	fmt.Println("Grid size          =", gs, "x", gs)
@@ -139,59 +140,4 @@ func (s *StarMap) InitMap(np int) error {
 
 	return nil
 
-}
-
-// https://www.dotnetperls.com/duplicates-go
-func removeDuplicates(elements []int) []int {
-	// Use map to record duplicates as we find them.
-	encountered := map[int]bool{}
-	result := []int{}
-
-	for v := range elements {
-		if encountered[elements[v]] == true {
-			// Do not add duplicate.
-		} else {
-			// Record this element as an encountered element.
-			encountered[elements[v]] = true
-			// Append to result slice.
-			result = append(result, elements[v])
-		}
-	}
-	// Return the new slice.
-	return result
-}
-
-func countDuplicates(dupArr []int) int {
-	dupsize := len(dupArr)
-	dupcount := 0
-	for i := 0; i < dupsize; i++ {
-		for j := i + 1; j < dupsize; j++ {
-			if dupArr[i] == dupArr[j] {
-				dupcount++
-				break
-			}
-		}
-	}
-	return dupcount
-}
-
-// subset returns true if the first array is completely
-// contained in the second array.
-func subset(first, second []int) bool {
-	set := make(map[int]int)
-	for _, value := range second {
-		set[value] += 1
-	}
-
-	for _, value := range first {
-		if count, found := set[value]; !found {
-			return false
-		} else if count < 1 {
-			return false
-		} else {
-			set[value] = count - 1
-		}
-	}
-
-	return true
 }

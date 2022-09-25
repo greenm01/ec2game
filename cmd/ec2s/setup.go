@@ -50,11 +50,15 @@ func newGameSetup(path string) error {
 	// Create players & assign homeworlds
 	for i, hw := range starMap.HomeWorlds {
 		id := i + 1
-		empires[id] = &core.Empire{UID: id,
+		empires[id] = &core.Empire{
+			ID: id,
 			Name:      "Rogue " + strconv.Itoa(id),
 			Planets:   []int{hw},
 			Tax:       50.0,
 			Autopilot: true,
+			CurProd:   100,
+			PrevProd:  100,
+			Status:    "ALIVE",
 		}
 		// Allocate resources to homeworld
 		starMap.Planets[hw].InitHomeworld(id)
@@ -86,6 +90,31 @@ func newGameSetup(path string) error {
 		e.Fleets[1].Ships = []Ship{Ship{ID: 3, Class: 2}, Ship{ID: 4, Class: 6}}
 		e.Fleets[2].Ships = []Ship{Ship{ID: 5, Class: 1}}
 		e.Fleets[3].Ships = []Ship{Ship{ID: 6, Class: 1}}
+		
+		// Setup Empire's planet database
+		e.PDB = core.PlanetDB{}
+		e.PDB.Init()
+		
+		for k,p := range starMap.Planets {
+			e.PDB.YearViewed[k] = -1
+			e.PDB.YearScouted[k] = -1
+			e.PDB.Pos[k] = p.Pos
+			if k == e.Planets[0] {
+				// We know about our own homeworld
+				e.PDB.YearViewed[k] = STARTYEAR
+				e.PDB.YearScouted[k] = STARTYEAR
+				e.PDB.Name[k] = "Prime"
+				e.PDB.MaxProd[k] = p.MaxProd
+				e.PDB.CurProd[k] = p.CurProd
+				e.PDB.BTC[k] = p.BTC
+				e.PDB.Owner[k] = "Self"
+				e.PDB.PrevOwner[k] = "NA"
+				e.PDB.OwnedFor[k] = 1
+				e.PDB.AR[k] = p.AR
+				e.PDB.GB[k] = p.GB	
+			}
+				
+		}
 		
 	}
 

@@ -1,7 +1,7 @@
 package core
 
 type Empire struct {
-	UID       int
+	ID        int
 	Name      string
 	Planets   []int
 	Fleets    map[int]*Fleet
@@ -10,4 +10,7 @@ type Empire struct {
 	Tax       int
 	PDB       PlanetDB
 	Autopilot bool
+	Status    string
+	CurProd   int
+	PrevProd  int
 }

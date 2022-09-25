@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func DropFileData(path string) (string, int, int, int) {
+func dropFileData(path string) (string, int, int, int) {
 	// path needs to include trailing slash!
 	var dropAlias string
 	var dropTimeLeft string
