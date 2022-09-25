@@ -18,7 +18,7 @@ import (
 // It returns a TCP connection armed with a timeout and wrapped into a
 // buffered ReadWriter.
 // https://github.com/AppliedGo/networking/blob/master/networking.go
-func Open(addr string) (*bufio.ReadWriter, error) {
+func open(addr string) (*bufio.ReadWriter, error) {
 	// Dial the remote process.
 	// Note that the local port is chosen on the fly. If the local port
 	// must be a specific one, use DialTCP() instead.
@@ -31,12 +31,12 @@ func Open(addr string) (*bufio.ReadWriter, error) {
 }
 
 type bbsClient struct {
-	user string
-	ip string
-	port string
-	tui *tea.Program
-	buf bufio.ReadWriter
-	state core.PlayerState
+	user 	string
+	ip 		string
+	port 	string
+	tui 	*tea.Program
+	rw 		*bufio.ReadWriter
+	state	core.PlayerState
 }
 
 func (c *bbsClient) Run(m ui.Menu) error {
@@ -59,34 +59,31 @@ func (c *bbsClient) start() error {
 	addr := c.ip + ":" + c.port
 		
 	// Open a connection to the server.
-	rw, err := Open(addr)
+	var err error
+	c.rw, err = open(addr)
 	if err != nil {
 		return errors.Wrap(err, "Client: Failed to open connection to "+addr)
 	}	
 	
 	// Send a USER request.
 	log.Println("Send the USER request.")
-	n, err := rw.WriteString("USER: " + c.user + "\n")
+	n, err := c.rw.WriteString("USER: " + c.user + "\n")
 	if err != nil {
 		return errors.Wrap(err, "Could not send the USER request ("+strconv.Itoa(n)+" bytes written)")
 	}	
 	
-	if err = flushBuffer(rw); err != nil { return err }
+	if err = flushBuffer(c.rw); err != nil { return err }
 
 	// Read the reply.
 	log.Println("Read the reply.")
-	c.state, err = core.DecodePlayerState(rw)
+	c.state, err = core.DecodePlayerState(c.rw)
 	if err != nil {
 		return errors.Wrap(err, "Client: Failed to read the reply.")
 	}	
 	log.Println("USER request: got " + c.state.User.Name + "'s game data.")
 
-	if err = flushBuffer(rw); err != nil { return err }
-	
-	for {
-		
-	}
-	
+	if err = flushBuffer(c.rw); err != nil { return err }
+			
 	return nil
                
 }
