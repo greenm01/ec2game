@@ -103,9 +103,9 @@ func (m Pager) headerView() string {
 
 func (m Pager) footerView() string {
 	info := infoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
-	line := strings.Repeat("─", max(0, m.viewport.Width-lg.Width(info)))
+	line := "(esc to quit) "
+	line += strings.Repeat("─", max(0, m.viewport.Width-lg.Width(info)-len(line)))
 	bl := lg.JoinHorizontal(lg.Center, line, info)	
-	bl += "\nArrows to scroll, ESC to exit."
 	return bl
 }
 

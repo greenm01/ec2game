@@ -12,10 +12,13 @@ type PlayerState struct {
 	Year   int
 	GameFull bool
 	// Other empire data with UID as key
-	Names      map[int]string
-	NumPlanets map[int]int
-	CurProd    map[int]int
-	PrevProd   map[int]int
+	Names       map[int]string
+	Status		map[int]string
+	NumPlanets  map[int]int
+	PrevPlanets map[int]int
+	CurProd     map[int]int
+	PrevProd    map[int]int
+	Bios        map[int]string
 }
 
 func (p *PlayerState) Setup(gs GameState) {
@@ -28,15 +31,21 @@ func (p *PlayerState) Setup(gs GameState) {
 	} 
 
 	p.Names = make(map[int]string)
+	p.Status = make(map[int]string)
 	p.NumPlanets = make(map[int]int)
+	p.PrevPlanets = make(map[int]int)
 	p.CurProd = make(map[int]int)
 	p.PrevProd = make(map[int]int)
+	p.Bios = make(map[int]string)
 		
 	for key,e := range gs.Empires {
 		p.Names[key] = e.Name
+		p.Status[key] = e.Status
 		p.NumPlanets[key] = len(e.Planets)
+		p.PrevPlanets[key] = e.PrevPlanets
 		p.CurProd[key] = e.CurProd
 		p.PrevProd[key] = e.PrevProd
+		p.Bios[key] = e.Bio
 	}
 	
 }

@@ -31,12 +31,10 @@ func (ft *FirstTime) Build() {
 	
 	ft.title = title.String()
 	
-	// Yellow
 	yellow := lg.NewStyle().
 		Bold(true).
 		Foreground(lg.Color("11"))
 	
-	// White
 	white := lg.NewStyle().
 		Foreground(lg.Color("253")).
 		Width(26)

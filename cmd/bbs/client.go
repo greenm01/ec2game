@@ -47,11 +47,8 @@ func (c *bbsClient) Run() error {
 	
 	var menu ui.Menu
 	
-	if c.state.User.FirstTime == true {
-		menu = ftm()
-		el := ui.EmpireList{}
-		el.Build(c.state)
-		menu.Build("empires",&el)
+	if c.state.User.FirstTime {
+		menu = ftm(c.state)
 	} else {
 		//menu = mainMenu()
 	}

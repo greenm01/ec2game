@@ -51,14 +51,17 @@ func newGameSetup(path string) error {
 	for i, hw := range starMap.HomeWorlds {
 		id := i + 1
 		empires[id] = &core.Empire{
-			ID: id,
-			Name:      "Rogue " + strconv.Itoa(id),
-			Planets:   []int{hw},
-			Tax:       50.0,
-			Autopilot: true,
-			CurProd:   100,
-			PrevProd:  100,
-			Status:    "ALIVE",
+			ID:          id,
+			Name:        "Rogue " + strconv.Itoa(id),
+			Planets:     []int{hw},
+			PrevPlanets: 1,
+			Tax:       	 50.0,
+			Autopilot:   true,
+			CurProd:     100,
+			PrevProd:    100,
+			Status:      "ALIVE",
+			Bio:		 "We're an AI controlled empire. New players may " +
+			             "take our stead.",
 		}
 		// Allocate resources to homeworld
 		starMap.Planets[hw].InitHomeworld(id)

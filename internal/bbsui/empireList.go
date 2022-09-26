@@ -1,6 +1,8 @@
 package bbsui
 
 import (
+	"strconv"
+	"strings"
 	"github.com/greenm01/ec2game/internal/core"
 	
 	tea "github.com/charmbracelet/bubbletea"
@@ -14,10 +16,29 @@ var baseStyle = lg.NewStyle().
 
 type EmpireList struct {
 	table table.Model
+	year string
+	footer string
+	bios map[string]string
 }
 
 func (e *EmpireList) Build(ps core.PlayerState) {
 	
+
+	title := lg.NewStyle().
+		Bold(true).
+		SetString("STARDATE ").
+		Foreground(lg.Color("205"))
+
+	yellow := lg.NewStyle().
+		Bold(true).
+		Foreground(lg.Color("11"))
+	
+	e.year = " " + title.String() + yellow.Render(strconv.Itoa(ps.Year)) + "\n"
+	
+	e.footer = lg.NewStyle().
+		SetString(" (esc to quit) - previous year shown in parens.").
+		Foreground(lg.Color("57")).String()
+
 	columns := []table.Column{
 		{Title: "Empire Name", Width: 25},
 		{Title: "ID", Width: 6},
@@ -26,19 +47,28 @@ func (e *EmpireList) Build(ps core.PlayerState) {
 		{Title: "Status", Width:7},
 	}
 	
+	e.bios = make(map[string]string)
 	
-	rows := []table.Row{
-		{"The Zarkonian Empire", "1", "1", "100","ALIVE"},
-		{"Zzzzrrr", "2", "1", "100","ALIVE"},
-		{"Master Blaster", "3", "1", "100","ALIVE"},
+	var rows []table.Row	
+	for id,empire := range ps.Names {
+		planets := strconv.Itoa(ps.NumPlanets[id]) +
+		           " (" + strconv.Itoa(ps.PrevPlanets[id]) + ")"
+		prod := strconv.Itoa(ps.CurProd[id]) + 
+		        " (" + strconv.Itoa(ps.PrevProd[id]) + ")"
+		i := strconv.Itoa(id)
+		r := table.Row{empire, i, planets, prod, ps.Status[id]}
+		rows = append(rows,r)
+		e.bios[i] = ps.Bios[id]
 	}
 	
+	l := len(ps.Names)
+	if l > 24 { l = 24}
 	
 	t := table.New(
 		table.WithColumns(columns),
 		table.WithRows(rows),
 		table.WithFocused(true),
-		table.WithHeight(3),
+		table.WithHeight(l),
 	)
 
 	s := table.DefaultStyles()
@@ -64,10 +94,10 @@ func (e *EmpireList) Update(msg tea.Msg) tea.Cmd {
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
 			return changeMenu("ftm")
-		case "enter":
+		/*case "enter":
 			return tea.Batch(
 				tea.Printf("Let's go to %s!", e.table.SelectedRow()[1]),
-			)
+			)*/
 		}
 	}
 	var cmd tea.Cmd
@@ -77,7 +107,11 @@ func (e *EmpireList) Update(msg tea.Msg) tea.Cmd {
 }
 
 func (e EmpireList) View() string {
-	return baseStyle.Render(e.table.View()) + "\n"
+	var s strings.Builder
+    bio := e.bios[e.table.SelectedRow()[1]]
+	render := baseStyle.Render(e.table.View()) + "\n"	
+	s.WriteString(e.year + render + e.footer + "\n\n " + bio)
+	return s.String()
 }
 
 

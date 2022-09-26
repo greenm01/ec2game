@@ -24,7 +24,7 @@ func run() error {
 }
 
 // ftm initializes the First Time Menu
-func ftm() ui.Menu {
+func ftm(ps core.PlayerState) ui.Menu {
 	var menu ui.Menu
 	f := ui.FirstTime{}
 	f.Build()
@@ -32,6 +32,9 @@ func ftm() ui.Menu {
 	pager := ui.Pager{}
 	pager.Build(ui.Intro())
 	menu.Build("intro", &pager)
+	el := ui.EmpireList{}
+	el.Build(ps)
+	menu.Build("empires",&el)
 	return menu
 }
 
