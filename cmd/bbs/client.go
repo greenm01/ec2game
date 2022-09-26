@@ -39,14 +39,25 @@ type bbsClient struct {
 	state	core.PlayerState
 }
 
-func (c *bbsClient) Run(m ui.Menu) error {
+func (c *bbsClient) Run() error {
 	
 	if err := c.start(); err != nil {
 		return err
 	}
 	
+	var menu ui.Menu
+	
+	if c.state.User.FirstTime == true {
+		menu = ftm()
+		el := ui.EmpireList{}
+		el.Build(c.state)
+		menu.Build("empires",&el)
+	} else {
+		//menu = mainMenu()
+	}
+	
 	ui.Cls()
-	c.tui = tea.NewProgram(m)
+	c.tui = tea.NewProgram(menu)
 	if err := c.tui.Start(); err != nil {
 		return err
 	}

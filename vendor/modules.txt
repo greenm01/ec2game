@@ -8,6 +8,7 @@ github.com/akrylysov/pogreb/internal/hash
 ## explicit; go 1.13
 github.com/charmbracelet/bubbles/key
 github.com/charmbracelet/bubbles/spinner
+github.com/charmbracelet/bubbles/table
 github.com/charmbracelet/bubbles/viewport
 # github.com/charmbracelet/bubbletea v0.22.1
 ## explicit; go 1.13

@@ -20,7 +20,7 @@ func run() error {
 	alias,_,_,_ := dropFileData(dropPath)
 	
 	bbs := bbsClient{user:alias,ip:config.IP,port:config.Port}
-	return bbs.Run(ftm()) 
+	return bbs.Run() 
 }
 
 // ftm initializes the First Time Menu

@@ -102,14 +102,16 @@ func (ft *FirstTime) Update(msg tea.Msg) tea.Cmd {
 		switch msg.Type {
 		case tea.KeyRunes:
 			switch string(msg.Runes) {
-				case "q":
+				case "q", "Q":
 					// clear the screen with ANSI code
 					return tea.Quit
-				case "h":
+				case "h", "H":
 					ft.showhelp = !ft.showhelp
 					return nil
-				case "s":
+				case "s", "S":
 					return changeMenu("intro")
+				case "l", "L":
+					return changeMenu("empires")
 			}
 		}
 	case menuCmd:
