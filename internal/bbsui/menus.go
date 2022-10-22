@@ -2,6 +2,7 @@ package bbsui
 
 import (
 	"fmt"
+	"github.com/greenm01/ec2game/internal/core"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -10,9 +11,10 @@ func Cls() {
 }
 
 // address keeps track of the current menu
-var address arbiter
+var arb arbiter
 
 type arbiter struct {
+	modelMap map[string]tea.Model
 	address string
 }
 
@@ -24,57 +26,70 @@ func (a *arbiter) Set(adr string) {
 	a.address = adr
 }
 
-type menuCmd bool
-
-func changeMenu(adr string) tea.Cmd {
-	address.Set(adr)
-	var m menuCmd
-	return func() tea.Msg {
-		Cls()
-		return m
-	} 
+func (a *arbiter) GetModel(adr string) tea.Model {
+	if adr == "bio" {
+		a.modelMap["bio"],_ = a.modelMap["bio"].Update(tea.KeyEnter)
+	}
+	return a.modelMap[adr]
 }
 
-type Model interface {
-	Update(tea.Msg) (tea.Cmd)
-	View() string
+func (a *arbiter) Update(adr string, m tea.Model) {
+	a.modelMap[adr] = m
+	a.address = adr
 }
 
-func UDate (m Model, msg tea.Msg) tea.Cmd  {
-	return m.Update(msg)
-}
-
-type Menu struct {
-	MenuMap map[string]Model
-}
-
-func (m *Menu) Build(address string, model Model) {
+func (a *arbiter) Add(address string, model tea.Model) {
 	if address == "" {
 		panic("address should not be empty")
 	}
 	if model == nil {
 		panic("model should not be nil")
 	}
-	if m.MenuMap == nil {
-		m.MenuMap = make(map[string]Model)
+	if a.modelMap == nil {
+		a.modelMap = make(map[string]tea.Model)
 	}
-	m.MenuMap[address] = model
+	a.modelMap[address] = model
 }
 
-func (m Menu) Init() tea.Cmd {
-	return changeMenu("ftm")
+type menuCmd bool
+
+func changeMenu(adr string) tea.Cmd {
+	arb.Set(adr)
+	var m menuCmd
+	m = true
+	return func() tea.Msg {
+		Cls()
+		return m
+	} 
 }
 
-func (m Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	adr := address.Get()
-	cmd := UDate(m.MenuMap[adr],msg)
-	return m,cmd
+// ftm initializes the First Time Menu
+func FtmSetup(ps core.PlayerState) tea.Model {
+	
+	ftm := FirstTime{}
+	ftm.Build()
+	arb.Add("ftm", ftm)
+	
+	pager := Pager{}
+	pager.Build(Intro())
+	arb.Add("intro", pager)
+	
+	el := EmpireList{}
+	el.Build(ps)
+	arb.Add("empires", el)
+	
+	join := Join{}
+	join.Build()
+	arb.Add("join", join)
+	
+	bio := Bio{}
+	bio.Build()
+	arb.Add("bio", bio)
+	
+	return ftm
+	
 }
 
-func (m Menu) View() string {
-	adr := address.Get()
-	return m.MenuMap[adr].View()
-}
 
 /*
 type MainMenu struct {

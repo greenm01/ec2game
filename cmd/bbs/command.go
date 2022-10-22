@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/greenm01/ec2game/internal/core"
-	ui "github.com/greenm01/ec2game/internal/bbsui"
 )
 
 func run() error {
@@ -23,18 +22,5 @@ func run() error {
 	return bbs.Run() 
 }
 
-// ftm initializes the First Time Menu
-func ftm(ps core.PlayerState) ui.Menu {
-	var menu ui.Menu
-	f := ui.FirstTime{}
-	f.Build()
-	menu.Build("ftm", &f)
-	pager := ui.Pager{}
-	pager.Build(ui.Intro())
-	menu.Build("intro", &pager)
-	el := ui.EmpireList{}
-	el.Build(ps)
-	menu.Build("empires",&el)
-	return menu
-}
+
 

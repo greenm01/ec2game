@@ -21,6 +21,10 @@ type EmpireList struct {
 	bios map[string]string
 }
 
+func (e EmpireList) Init() tea.Cmd {
+	return nil
+}
+
 func (e *EmpireList) Build(ps core.PlayerState) {
 	
 
@@ -87,13 +91,13 @@ func (e *EmpireList) Build(ps core.PlayerState) {
 	
 }
 
-func (e *EmpireList) Update(msg tea.Msg) tea.Cmd {
+func (e EmpireList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
-			return changeMenu("ftm")
+			return e, changeMenu("ftm")
 		/*case "enter":
 			return tea.Batch(
 				tea.Printf("Let's go to %s!", e.table.SelectedRow()[1]),
@@ -102,7 +106,7 @@ func (e *EmpireList) Update(msg tea.Msg) tea.Cmd {
 	}
 	var cmd tea.Cmd
 	e.table, cmd = e.table.Update(msg)
-	return  cmd
+	return  e, cmd
 
 }
 

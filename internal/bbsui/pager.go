@@ -44,6 +44,10 @@ type Pager struct {
 	viewport viewport.Model
 }
 
+func (p Pager) Init() tea.Cmd {
+	return nil
+}
+
 func (p *Pager) Build(s string) {
 	
 	p.content = s
@@ -70,7 +74,7 @@ func (p *Pager) Build(s string) {
 
 }
 
-func (m *Pager) Update(msg tea.Msg) tea.Cmd {
+func (m Pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	
 	var (
 		cmd  tea.Cmd
@@ -80,7 +84,7 @@ func (m *Pager) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if k := msg.String(); k == "esc" {
-			return changeMenu("ftm")
+			return arb.GetModel("ftm"), changeMenu("ftm")
 		}
 	}
 		
@@ -88,7 +92,7 @@ func (m *Pager) Update(msg tea.Msg) tea.Cmd {
 	m.viewport, cmd = m.viewport.Update(msg)
 	cmds = append(cmds, cmd)
 
-	return tea.Batch(cmds...)
+	return m, tea.Batch(cmds...)
 }
 
 func (m Pager) View() string {

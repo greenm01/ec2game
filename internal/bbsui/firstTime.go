@@ -21,6 +21,10 @@ type FirstTime struct {
 	started bool
 }
 
+func (ft FirstTime) Init() tea.Cmd { 
+	return ft.spin.Tick
+}
+
 func (ft *FirstTime) Build() {
 
 	title := lg.NewStyle().
@@ -93,41 +97,43 @@ func (ft *FirstTime) Build() {
 
 }
 
-func (ft *FirstTime) Update(msg tea.Msg) tea.Cmd {
+func (ft FirstTime) Update(msg tea.Msg)  (tea.Model, tea.Cmd) {
 	
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
-		case tea.KeyRunes:
-			switch string(msg.Runes) {
-				case "q", "Q":
-					// clear the screen with ANSI code
-					return tea.Quit
-				case "h", "H":
-					ft.showhelp = !ft.showhelp
-					return nil
-				case "s", "S":
-					return changeMenu("intro")
-				case "l", "L":
-					return changeMenu("empires")
-			}
+			case tea.KeyRunes:
+				switch string(msg.Runes) {
+					case "q", "Q":
+						// clear the screen with ANSI code
+						return ft, tea.Quit
+					case "h", "H":
+						ft.showhelp = !ft.showhelp
+						return ft, nil
+					case "s", "S":
+						return arb.GetModel("intro"), changeMenu("intro")
+					case "l", "L":
+						return arb.GetModel("empires"), changeMenu("empires")
+					case "j", "J":
+						return arb.GetModel("join"), changeMenu("join")
+				}
 		}
-	case menuCmd:
-		return ft.spin.Tick
 	case error:
 		ft.err = msg
-		return nil
+		return ft, nil
+	case menuCmd:
+		return ft, ft.spin.Tick
 	default:
 		var cmd tea.Cmd	
 		ft.spin, cmd = ft.spin.Update(msg)
-		return cmd
+		return ft, cmd
 	}
 
-	return nil
+	return ft, nil
 
 }
 
-func (ft *FirstTime) View() string {
+func (ft FirstTime) View() string {
 	var s strings.Builder
 	s.WriteString(ft.menu + "\n\n" + ft.cmdLine + ft.spin.View())
 	if(ft.showhelp) {

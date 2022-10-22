@@ -45,20 +45,21 @@ func (c *bbsClient) Run() error {
 		return err
 	}
 	
-	var menu ui.Menu
+	var menu tea.Model
 	
 	if c.state.User.FirstTime {
-		menu = ftm(c.state)
+		menu = ui.FtmSetup(c.state)
 	} else {
 		//menu = mainMenu()
 	}
 	
-	ui.Cls()
+	//ui.Cls()
 	c.tui = tea.NewProgram(menu)
+	c.tui.EnterAltScreen()
 	if err := c.tui.Start(); err != nil {
 		return err
 	}
-	ui.Cls()
+	//ui.Cls()
 	return nil
 }
 
