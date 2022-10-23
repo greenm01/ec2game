@@ -89,29 +89,3 @@ func FtmSetup(ps core.PlayerState) tea.Model {
 	return ftm
 	
 }
-
-
-/*
-type MainMenu struct {
-	
-}
-
-type GeneralMenu struct {
-	
-}
-
-type PlanetMenu struct {
-	
-}
-
-type BuildMenu struct {
-	
-}
-
-type FleetMenu struct {
-	
-}
-
-type MessageMenu struct {
-	
-}*/
