@@ -13,6 +13,10 @@ func Cls() {
 // address keeps track of the current menu
 var arb arbiter
 
+func GetModel(s string) tea.Model {
+	return arb.GetModel(s)	
+}
+
 type arbiter struct {
 	modelMap map[string]tea.Model
 	address string

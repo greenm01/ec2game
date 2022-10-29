@@ -13,6 +13,10 @@ type Join struct {
 	valid bool
 }
 
+func (j Join) GetText() string {
+	return j.textInput.Value()	
+}
+
 func (j Join) Init() tea.Cmd {
 	return ti.Blink
 }
@@ -43,7 +47,8 @@ func (j Join) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				case tea.KeyRunes:
 					switch string(msg.Runes) {
 						case "y", "Y":
-						    if !j.valid { break } 
+						    if !j.valid { break }
+							arb.Update("join", j) 
 							return arb.GetModel("bio"), changeMenu("bio")
 						case "n", "N":
 							if !j.valid { break }

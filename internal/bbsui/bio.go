@@ -13,6 +13,10 @@ type Bio struct {
 	valid bool
 }
 
+func (b Bio) GetText() string {
+	return b.textInput.Value()	
+}
+
 func (b Bio) Init() tea.Cmd {
 	return ti.Blink
 }
@@ -43,8 +47,9 @@ func (b Bio) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				case tea.KeyRunes:
 					switch string(msg.Runes) {
 						case "y", "Y":
-						    if !b.valid { break } 
-							return arb.GetModel("ftm"), changeMenu("ftm")
+						    if !b.valid { break }
+							arb.Update("bio", b) 
+							return arb.GetModel("ftm"), tea.Quit
 						case "n", "N":
 							if !b.valid { break }
 							b.valid = false

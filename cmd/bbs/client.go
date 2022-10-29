@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"bufio"
 	"log"
@@ -49,17 +50,23 @@ func (c *bbsClient) Run() error {
 	
 	if c.state.User.FirstTime {
 		menu = ui.FtmSetup(c.state)
+		c.tui = tea.NewProgram(menu)
+		c.tui.EnterAltScreen()
+		if err := c.tui.Start(); err != nil {
+			return err
+		}
+		
+		// Type assertion magic
+		join := ui.GetModel("join").(ui.Join)		
+		bio := ui.GetModel("bio").(ui.Bio)
+		
+		fmt.Println(join.GetText())
+		fmt.Println(bio.GetText())
+		
 	} else {
 		//menu = mainMenu()
 	}
 	
-	//ui.Cls()
-	c.tui = tea.NewProgram(menu)
-	c.tui.EnterAltScreen()
-	if err := c.tui.Start(); err != nil {
-		return err
-	}
-	//ui.Cls()
 	return nil
 }
 
