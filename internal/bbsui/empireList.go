@@ -97,7 +97,7 @@ func (e EmpireList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
-			return e, changeMenu("ftm")
+			return arb.GetModel("ftm"), changeMenu("ftm")
 		/*case "enter":
 			return tea.Batch(
 				tea.Printf("Let's go to %s!", e.table.SelectedRow()[1]),
