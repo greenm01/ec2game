@@ -48,7 +48,9 @@ func (c *bbsClient) Run() error {
 	
 	var menu tea.Model
 	
+	// Firt time user	
 	if c.state.User.FirstTime {
+
 		menu = ui.FtmSetup(c.state)
 		c.tui = tea.NewProgram(menu)
 		c.tui.EnterAltScreen()
@@ -57,11 +59,23 @@ func (c *bbsClient) Run() error {
 		}
 		
 		// Type assertion magic
-		join := ui.GetModel("join").(ui.Join)		
+		empire := ui.GetModel("join").(ui.Join)		
 		bio := ui.GetModel("bio").(ui.Bio)
 		
-		fmt.Println(join.GetText())
-		fmt.Println(bio.GetText())
+		ne := core.NewEmpire {Name: empire.GetText(), Bio: bio.GetText()}
+
+		// TODO: skip if user didn't join the game
+		// Call back to server and setup empire
+			
+		// Send new empire request
+		
+		// Wait for response
+		
+		fmt.Println(ne.Name)
+		fmt.Println(ne.Bio)
+		
+		log.Println(ne.Name + " joined the game")
+		
 		
 	} else {
 		//menu = mainMenu()
